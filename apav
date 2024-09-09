@@ -1,0 +1,157 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use APAVgff2bed;
+use APAVstaCov;
+use APAVcallPAV;
+use APAVgfPAV;
+use APAVsim;
+use APAVvisSim;
+use APAVvisCov;
+use APAVvisPAV;
+use APAVvisPheno;
+use APAVvisEle;
+use APAVpipe;
+
+my $usage = "\nUsage: apav <command> ...\n
+
+Available commands:
+
+    Pipeline:
+	geneBatch		Automatically execute main commands for genes
+	generalBatch		Automatically execute main commands for the general target regions
+
+    Extract positions:
+    	gff2bed			Extract the coordinates of target regions from a GFF format file
+        
+    Calculate coverage:
+	staCov			Calculate coverage of target regions
+	mergeElecov		Merge neighboring elements with the same coverage
+	covPlotHeat		Plot a heatmap to give an overview of the coverage profile across samples
+        
+    Determine PAV:
+	callPAV			Determine presence/absence variations based on coverage
+	gFamPAV			Determine gene family presence/absence based on the gene PAV table
+	mergeElePAV		Merge neighboring elements with the same PAV
+
+    Estimate genome size:
+	pavSim			Simulate the size of pan-genome and core-genome from the PAV table
+	pavPlotSim		Draw growth curve of genome simulation
+
+    PAV analysis:
+	pavPlotStat		Plot a half-violin chart to show the number of regions in each group of samples
+	pavPlotHist		Plot a ring chart and a histogram to show the classifications and distribution of target regions
+	pavPlotHeat		Plot a complex heat map to give an overview of the PAV profile
+	pavPlotBar		Plot a stacked bar chart to show the classifications of target regions in all samples
+	pavPCA			Perform PCA analysis for the PAV table and plot results
+	pavCluster		Cluster samples based on the PAV table and plot results
+
+    Phenotype assocation:
+	pavStaPheno		Perform Fisher's exact test and Wilcoxon tests to determine phenotype association
+	pavPlotPhenoHeat	Show the main result of phenotype association analysis with a heat map
+	pavPlotPhenoBlock	Display the percentage of samples containing target regions in each group of a discrete phenotype
+	pavPlotPhenoMan		Draw a Manhattan plot to show the results of a given phenotype
+	pavPlotPhenoBar		Show the relationship between a specific genomic region and a specific phenotype in a bar plot
+	pavPlotPhenoVio		Show the relationship between a specific genomic region and a specific phenotype in a violin plot
+
+     Visualization of element regions:
+	elePlotCov		Display the coverage of elements in a specific target region
+	elePlotPAV		Display the PAV of elements in a specific target region
+	elePlotDepth		Display the depth of elements in a specific target region
+
+\n";
+
+
+die $usage if @ARGV<1;
+
+my %commands = (
+	"geneBatch"		=> 0,
+	"generalBatch"		=> 0,
+	"gff2bed"		=> 0,
+	"staCov"		=> 0,
+	"mergeElecov"		=> 0,
+	"callPAV"		=> 0,
+	"gFamPAV"		=> 0,
+	"mergeElePAV"		=> 0,
+	"pavSim"		=> 0,
+	"pavPlotSim"		=> 0,
+	"covPlotHeat"		=> 0,
+	"pavPlotStat"		=> 0,
+	"pavPlotHist"		=> 0,
+	"pavPlotHeat"		=> 0,
+	"pavPlotBar"		=> 0,
+	"pavPCA"		=> 0,
+	"pavCluster"		=> 0,
+	"pavStaPheno"		=> 0,
+	"pavPlotPhenoHeat"	=> 0,
+	"pavPlotPhenoBlock"	=> 0,
+	"pavPlotPhenoMan"	=> 0,
+	"pavPlotPhenoBar"	=> 0,
+	"pavPlotPhenoVio"	=> 0,
+	"elePlotCov"		=> 0,
+	"elePlotPAV"		=> 0,
+	"elePlotDepth"		=> 0
+);
+
+my $com = shift @ARGV;
+if(defined $commands{$com}){
+	$commands{$com}=1;
+}else{	
+	print STDERR "Invalid command: $com\n";
+	print $usage;
+}
+
+if($commands{"geneBatch"}){
+	APAVpipe::geneBatch(@ARGV);
+}elsif($commands{"generalBatch"}){
+	APAVpipe::generalBatch(@ARGV);
+}elsif($commands{"gff2bed"}){
+	APAVgff2bed::gff2bed(@ARGV);
+}elsif($commands{"staCov"}){
+	APAVstaCov::staCov(@ARGV);
+}elsif($commands{"mergeElecov"}){
+	APAVmerge::mergeElecov(@ARGV);
+}elsif($commands{"callPAV"}){
+	APAVcallPAV::callPAV(@ARGV);
+}elsif($commands{"gFamPAV"}){
+	APAVgfPAV::gfpav(@ARGV);
+}elsif($commands{"mergeElePAV"}){
+	APAVmerge::mergeElePAV(@ARGV);
+}elsif($commands{"pavSim"}){
+        APAVsim::sim(@ARGV);
+}elsif($commands{"pavPlotSim"}){
+        APAVvisSim::simPlotCurve(@ARGV);
+}elsif($commands{"covPlotHeat"}){
+        APAVvisCov::covPlotHeat(@ARGV);
+}elsif($commands{"pavPlotStat"}){
+        APAVvisPAV::pavPlotStat(@ARGV);
+}elsif($commands{"pavPlotHist"}){
+        APAVvisPAV::pavPlotHist(@ARGV);
+}elsif($commands{"pavPlotHeat"}){
+        APAVvisPAV::pavPlotHeat(@ARGV);
+}elsif($commands{"pavPlotBar"}){
+        APAVvisPAV::pavPlotBar(@ARGV);
+}elsif($commands{"pavPCA"}){
+        APAVvisPAV::pavPCA(@ARGV);
+}elsif($commands{"pavCluster"}){
+        APAVvisPAV::pavCluster(@ARGV);
+}elsif($commands{"pavStaPheno"}){
+        APAVvisPheno::phenosta(@ARGV);
+}elsif($commands{"pavPlotPhenoHeat"}){
+        APAVvisPheno::phenoPlotHeat(@ARGV);
+}elsif($commands{"pavPlotPhenoBlock"}){
+        APAVvisPheno::phenoPlotBlock(@ARGV);
+}elsif($commands{"pavPlotPhenoMan"}){
+        APAVvisPheno::phenPlotManhattan(@ARGV);
+}elsif($commands{"pavPlotPhenoBar"}){
+        APAVvisPheno::phenoPlotBar(@ARGV);
+}elsif($commands{"pavPlotPhenoVio"}){
+        APAVvisPheno::phenoPlotViolin(@ARGV);
+}elsif($commands{"elePlotCov"}){
+        APAVvisEle::elePlotCov(@ARGV);
+}elsif($commands{"elePlotPAV"}){
+        APAVvisEle::elePlotPAV(@ARGV);
+}elsif($commands{"elePlotDepth"}){
+        APAVvisEle::elePlotDepth(@ARGV);
+}
+
