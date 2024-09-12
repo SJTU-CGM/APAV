@@ -1,36 +1,35 @@
 
 # APAV: An advanced pan-genome analysis and visualization toolkit for genomic pres-ence/absence variations
-APAV is an advanced pan-genome analysis and visualization toolkit for genomic presence-absence variations. It accepts the GFF file of genes and the BED file of any target regions. It takes map-to-pan strategy and computes coverage of target regions at the whole level and element level. You can review and check all PAVs and samples in the automatically generated interactive web reports. Based on the PAV table, APAV also offered various subsequent analysis and visualization functions, including basic statistics, sample clustering, genome size estimation, and phenotype association analysis.
-
+APAV is an advanced toolkit for comprehensive PAV analysis and visualization. It optimized the PAV detection process by incorporating an element-level analysis and adding PAV analysis for arbitrary regions in a genome. The resulted PAV profile can be viewed and checked in interactive web reports, providing researchers the ability to verify the read depth, region coverage and absent intervals of each PAV conveniently. Additionally, APAV offers various subsequent analysis and visualization functions based on the PAV table, including basic statistics, sample clustering, genome size estimation, and phenotype association analysis.
 
 
 ## Requirements
 ### PAV calling
-* Perl
-* Samtools<br>Samtools is used to compute the read depth of positions in target regions. Please install it first and make sure it is under your PATH.
+* <b>Perl</b>
+* <b>Samtools</b><br>Samtools is used to compute the read depth of positions in target regions. Please install it first and make sure it is under your `PATH`.
 
 ### Subsequent analysis and visualization based on the PAV profile
-* R <br>R is utilized for visualization and statistical tests in the APAV toolbox. Please install R first and make sure R and Rscript are under your PATH.
-* APAVplot <br>APAVplot is an R package specifically designed for visualization of PAV analysis. The code and more details please see [here](https://github.com/SJTU-CGM/APAVplot).
+* <b>R</b> <br>R is utilized for visualization and statistical tests in the APAV toolbox. Please install R first and make sure `R` and `Rscript` are under your `PATH`.
+* <b>APAVplot</b> <br>`APAVplot` is an R package specifically designed for visualization of PAV analysis. For the code and more details please see [here](https://github.com/SJTU-CGM/APAVplot).
 
 ## Installation procedures
 
-1. Download the APAV toolbox from github:
+1. You can download the APAV toolbox from github:
 ```
 $ git clone git@github.com:SJTU-CGM/APAV.git
 ```
- Alternatively, you also could obtain the toolbox in the [APAV](https://cgm.sjtu.edu.cn/APAV/install.html) website and uncompress the APAV toolbox package:
+ Alternatively, you also could obtain the toolbox on the [APAV](https://cgm.sjtu.edu.cn/APAV/install.html) website and uncompress the APAV toolbox package:
 ```
 $ tar zxvf APAV-v**.tar.gz
 ```
 
-2. Add `apav` to PATH and add `lib/` to PERL5LIB
+2. You need to add `apav` to `PATH` and add `lib/` to `PERL5LIB`
 ```
 $ export PATH=$PATH:/path/to/APAV/:
 $ export PERL5LIB=$PERL5LIB:/path/to/APAV/lib/:
 ```
 
-3. Install R package 'APAVplot'
+3. The R package `APAVplot` is required for plotting
 ```
 ## Install "ComplexHeatmap" from BiocManager 
 $ conda install r-BiocManager  ## OR: Rscript -e "install.packages('BiocManager')"
@@ -44,7 +43,7 @@ $ Rscript -e "devtools::install_github('xiaonui/APAVplot')"
 ```
 _You can skip this step if you are going to use APAVplot later to draw plots in the R environment_
 
-4. Test if APAV toolkit is installed successfully
+4. Finally, you can test if the APAV toolkit is installed successfully by:
 ```
 $ apav
 ```
@@ -101,7 +100,9 @@ The usage information for each command can be shown with the `--help` or `-h` op
 
 ## Quick start
 
-The main steps can be automatically executed with the `geneBatch`/`generalBatch` command. `geneBatch` command is used for gene region and takes GFF file as input. `generalBatch` command is used for any target region and takes BED file as input.
+### Integrated commands
+
+The main steps can be automatically executed with the `geneBatch`/`generalBatch` command. The `geneBatch` command is used for gene region and takes the GFF file as input. The `generalBatch` command is used for any target region and takes the BED file as input.
 
 ```
 cd ${APAV_PATH}/demo/
@@ -116,5 +117,89 @@ apav generalBatch --bed demo2_general.bed --bamdir bam --pheno demo_sample.pheno
 apav generalBatch --bed demo3_general.bed --bamdir bam --pheno demo_sample.pheno --fa demo.fa.gz --rmele --out demo3
 ```
 
-The step-by-step procedure is available on the [APAV](https://cgm.sjtu.edu.cn/APAV/start.html) website. The PAV reports for demos can also be viewed on [here](https://cgm.sjtu.edu.cn/APAV/demo.html).
+The PAV reports for demos can also be viewed [here](https://cgm.sjtu.edu.cn/APAV/demo.html).
 
+### Step-by-step commands
+
+#### 1. Coordinate extraction
+For genes, you need to use the `gff2bed` command to extract the coordinates of genes, genetic elements and bins in upstream/downstream. It merges elements with the same coordinates and outputs them in BED format. For general target region, skip this step.
+```
+apav gff2bed --gff demo1_gene.gff3 --out demo1.bed
+```
+Options `--chrl`, `--up_n`, `--up_bin`, `--down_n`, `--dwon_bin` are used for extracting upstream and downstream elements.
+```
+apav gff2bed --gff demo1_gene.gff3 --chrl demo1.chrl --up_n 10 --up_bin 100 --down_n 10 --down_bin 100 --out demo1.bed
+```			
+
+#### 2. Coverage calculation
+Use the `staCov` command to compute the coverage of regions. It counts the percentage of covered bases in the whole region and each element region.
+```
+apav staCov --bed demo1.bed --bamdir bam --asgene
+```
+The `covPlotHeat` command will plot a heatmap to give an overview of coverage profile.
+```
+apav covPlotHeat --cov demo1.cov
+```
+		
+#### 3. PAV determination
+Based on the coverage, the `callPAV` command determines the presence-absence variation. It generates PAV profiles and two interactive web reports.
+```
+apav callPAV --cov demo1.cov --pheno demo_sample.pheno --fa demo.fa.gz --gff demo1_gene.gff3 
+apav callPAV --cov demo1_ele.cov --pheno demo_sample.pheno
+```
+
+#### 4. Gene family PAV determination
+For genes, the `gFamPAV` command allows further determination of gene family PAV profile.  
+```
+apav gFamPAV --pav demo1_all.pav --fam demo1_gene.fam
+```
+	
+#### 5. Genome size estimation
+Based on the PAV table, you can use the `pavSim` command to estimate genome size by simulating the size of the pan-genome and core-genome.
+```
+apav pavSim --pav demo1_all.pav
+## Simulation in groups
+cat demo_sample.pheno | cut -f 1,2 > demo_sample.group
+apav pavSim --pav demo1_all.pav --group demo_sample.group
+```
+The `pavPlotSim` command can draw the growth curve of genome simulation.
+```
+apav pavPlotSim --simout demo1_all.simout
+```
+
+#### 6. Common PAV analysis and visulization
+APAV provides various commands for common PAV analysis. The `pavPlotStat` command shows the total number of regions in all samples. The `pavPlotHist` command shows the classifications and distribution of regions. The `pavPlotHeat` command gives an overview of the PAV table. The `pavPlotBar` command shows the composition of each sample. The `pavPCA` command performs PCA analysis. The `pavCluster` command clusters samples based on the PAV table.
+```
+apav pavPlotStat --pav demo1_all.pav
+apav pavPlotHist --pav demo1_all.pav
+apav pavPlotHeat --pav demo1_all.pav
+apav pavPlotBar --pav demo1_all.pav
+apav pavPCA --pav demo1_all.pav
+apav pavCluster --pav demo1_all.pav
+```
+
+#### 7. Phenotype association analysis
+Use the `pavStaPheno` command to determine phenotype association.
+``` 
+apav pavStaPheno --pav demo1_all.pav --pheno demo_sample.pheno
+```
+The `pavStaPhenoHeat` command gives an overview of significantly phenotype-related regions. The `pavPlotPhenoBlock` command is used to display discrete phenotype. The `pavPlotPhenoMan` command draws a Manhattan plot. The `pavPlotPhenoBar` and `pavPlotPhenoVio` commands show the relationship between a certain genomic region and a certain phenotype.
+```
+apav pavPlotPhenoHeat --pav demo1_all.pav --pheno_res demo1_all.phenores
+apav pavPlotPhenoBlock --pav demo1_all.pav --pheno demo_sample.pheno --pheno_res demo1_all.phenores --pheno_name Gender
+apav pavPlotPhenoMan --pav demo1_all.pav --pheno demo_sample.pheno --pheno_res demo1_all.phenores --pheno_name Gender
+apav pavPlotPhenoBar --pav demo1_all.pav --pheno demo_sample.pheno --pheno_name Location --region_name ENSG00000233493.3
+apav pavPlotPhenoVio --pav demo1_all.pav --pheno demo_sample.pheno --pheno_name Age --region_name ENSG00000254415.3
+```
+These steps also apply to elements.
+	
+#### 8. Visualization of element regions
+For the focused target region, you can use the `elePlotCov`/`elePlotPAV` command to observe the coverage/PAV of elements. Furthermore, the `elePlotDepth` command can display the read depth in target regions.
+```
+grep 'ENSG00000126251.6' demo1_gene.gff3 > ENSG00000126251.6.gff3
+grep -E 'Annotation|ENSG00000126251.6' demo1_ele.cov > ENSG00000126251.6.elecov
+grep -E 'Annotation|ENSG00000126251.6' demo1_ele_all.pav > ENSG00000126251.6.elepav
+apav elePlotCov --elecov ENSG00000126251.6.elecov --pheno demo_sample.pheno --gff ENSG00000126251.6.gff3
+apav elePlotPAV --elepav ENSG00000126251.6.elepav --pheno demo_sample.pheno --gff ENSG00000126251.6.gff3
+apav elePlotDepth --ele ENSG00000126251.6.elecov  --bamdir bam --pheno demo_sample.pheno --gff ENSG00000126251.6.gff3
+```
