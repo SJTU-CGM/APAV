@@ -10,13 +10,13 @@ APAV is an advanced toolkit for comprehensive PAV analysis and visualization. It
 
 ### Subsequent analysis and visualization based on the PAV profile
 * <b>R</b> <br>R is utilized for visualization and statistical tests in the APAV toolbox. Please install R first and make sure `R` and `Rscript` are under your `PATH`.
-* <b>APAVplot</b> <br>`APAVplot` is an R package specifically designed for visualization of PAV analysis. For the code and more details please see [here](https://github.com/SJTU-CGM/APAVplot).
+* <b>APAVplot</b> <br>`APAVplot` is an R package specifically designed for visualization of PAV analysis. Follow the installation step, or you can install it by yourself. For the code and more details please see [here](https://github.com/SJTU-CGM/APAVplot).
 
 ## Installation procedures
 
 1. You can download the APAV toolbox from github:
 ```
-$ git clone git@github.com:SJTU-CGM/APAV.git
+$ git clone https://github.com/SJTU-CGM/APAV.git
 ```
  Alternatively, you also could obtain the toolbox on the [APAV](https://cgm.sjtu.edu.cn/APAV/install.html) website and uncompress the APAV toolbox package:
 ```
@@ -39,7 +39,7 @@ $ conda install bioconda::bioconductor-complexheatmap
 
 ## Install "APAVplot"
 $ conda install r-devtools ## OR: Rscript -e "install.packages('devtools')" 
-$ Rscript -e "devtools::install_github('xiaonui/APAVplot')"
+$ Rscript -e "devtools::install_github('SJTU-CGM/APAVplot')"
 ```
 _You can skip this step if you are going to use APAVplot later to draw plots in the R environment_
 
