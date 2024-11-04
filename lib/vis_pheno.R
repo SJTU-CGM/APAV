@@ -19,7 +19,7 @@ library(APAVplot)
 
 ################### Construct a PAV object
 
-pav_data <- read.table(pavdata, header = T, comment.char = "#")
+pav_data <- read.table(pavdata, header = T, comment.char = "#", sep = "\t", check.names = F)
 
 myregion <- pav_data[, 1:4]
 rownames(myregion) <- pav_data$Annotation
@@ -35,16 +35,13 @@ if(command == "manhattan"){
 mypav <- pav_data[, 6:ncol(pav_data)]
 rownames(mypav) <- pav_data$Annotation
 
-if(length(which(rowSums(mypav) == 0)) > 0){
-  warning(paste0("Remove ", length(which(rowSums(mypav) == 0)), " regions (", paste0(rownames(mypav)[which(rowSums(mypav) == 0)], collapse = ",") ,") which are 0(absence) in all samples."))
-  mypav <- mypav[-which(rowSums(mypav) == 0),]
-}
+mypav <- check_region(mypav)
 
 if(phenodata == "NULL"){
   my_pav <- get_pav_obj(mypav,
                         region_info = myregion)
 }else{
-  mypheno <- read.table(phenodata, header=T)
+  mypheno <- read.table(phenodata, header=T, comment.char = "#", sep = "\t", quote = "" )
   rownames(mypheno) <- mypheno[, 1]
   mypheno <- mypheno[, -1, drop = F]
 
@@ -91,7 +88,7 @@ if(command == "stat"){
             	row_dend_width = grid::unit(as.numeric(argv[21]), "mm"),
             	row_sorted = toc(argv[22]),
 
-            	show_row_names = tobool(argv[23]),
+            	show_row_names = !tobool(argv[23]),
             	row_names_side = argv[24],
             	row_names_size = as.numeric(argv[25]),
             	row_names_rot = as.numeric(argv[26]),
@@ -103,7 +100,7 @@ if(command == "stat"){
             	column_dend_height = grid::unit(as.numeric(argv[31]), "mm"),
             	column_sorted = toc(argv[32]),
 
-            	show_column_names = tobool(argv[33]),
+            	show_column_names = !tobool(argv[33]),
             	column_names_side = argv[34],
             	column_names_size = as.numeric(argv[35]),
             	column_names_rot = as.numeric(argv[36]),
@@ -125,7 +122,6 @@ if(command == "stat"){
   dev.off()
 
 }else if(command == "block"){
-
   pheno_res <- read.table(argv[6], header = T, sep = "\t")
 
   pdf(file = paste0(out, ".pdf"), width = as.numeric(argv[7]), height = as.numeric(argv[8]))
@@ -151,7 +147,7 @@ if(command == "stat"){
                 row_dend_width = grid::unit(as.numeric(argv[22]), "mm"),
                 row_sorted = toc(argv[23]),
 
-                show_row_names = tobool(argv[24]),
+                show_row_names = !tobool(argv[24]),
                 row_names_side = argv[25],
                 row_names_size = as.numeric(argv[26]),
                 row_names_rot = as.numeric(argv[27]),
@@ -163,7 +159,7 @@ if(command == "stat"){
                 column_dend_height = grid::unit(as.numeric(argv[32]), "mm"),
                 column_sorted = toc(argv[33]),
 
-                show_column_names = tobool(argv[34]),
+                show_column_names = !tobool(argv[34]),
                 column_names_side = argv[35],
                 column_names_size = as.numeric(argv[36]),
                 column_names_rot = as.numeric(argv[37]),

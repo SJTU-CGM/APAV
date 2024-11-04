@@ -12,18 +12,20 @@ if (!require("APAVplot", quietly = TRUE))
     stop("Please install R package \"APAVplot\" first")
 library(APAVplot)
 
-cov_data <- read.table(covdata, header = T, comment.char = "#")
+cov_data <- read.table(covdata, header = T, comment.char = "#", sep = "\t", check.names = F)
 
 myregion <- cov_data[, 1:4]
 rownames(myregion) <- cov_data$Annotation
 mycov <- cov_data[, 6:ncol(cov_data)]
 rownames(mycov) <- cov_data$Annotation
 
+mycov <- check_region(mycov)
+
 if(phenodata == "NULL"){
   my_cov <- get_cov_obj(mycov, 
                         region_info = myregion)
 }else{
-  mypheno <- read.table(phenodata, header=T)
+  mypheno <- read.table(phenodata, header = T, comment.char = "#", sep = "\t", quote = "")
   rownames(mypheno) <- mypheno[, 1]
   mypheno <- mypheno[, -1, drop = F]
   

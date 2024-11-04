@@ -199,7 +199,7 @@ Warning: --region_info_color_list --pheno_info_color_list --anno_param_row_phen 
 		
 		'cov_colors=s'			=> \$cov_colors,
 		'region_info_color_list=s'	=> \%region_info_color_list,
-		'pheno_info_color_list'		=> \%pheno_info_color_list,
+		'pheno_info_color_list=s'	=> \%pheno_info_color_list,
 
 		'border=s'			=> \$border,
 		'cluster_rows!'			=> \$cluster_rows,

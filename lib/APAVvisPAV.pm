@@ -202,6 +202,9 @@ Options:
                                         (Default: 'complete')
 
 Visualization options:
+  --fig_width           <numeric>       The width of the figure.
+  --fig_height          <numeric>       The height of the figure.
+
   --show_relative 			Show relative value.
   
   --type_colors 	<colors>	The colors for classifications of the region, separated by commas.
@@ -709,7 +712,7 @@ times.
                 'pav_colors=s'                  => \$pav_colors,
 		'type_colors=s'			=> \$type_colors,
                 'region_info_color_list=s'      => \%region_info_color_list,
-                'pheno_info_color_list'         => \%pheno_info_color_list,
+                'pheno_info_color_list=s'       => \%pheno_info_color_list,
 
                 'hide_border=s'                 => \$hide_border,
 
@@ -788,6 +791,7 @@ times.
         my $exec = $dir."/"."vis_pav.R";
 
 	system("Rscript $exec $dir $pavdata $phenodata $out heatmap '$rm_softcore' '$rm_private' '$softcore_loss_rate' '$use_binomial' '$softcore_p_value' '$fig_width' '$fig_height' '$region_type'  '$pav_colors' '$type_colors' '$region_info_color_list_str' '$pheno_info_color_list_str' '$hide_border' '$block_name_size' '$block_name_rot' '$cluster_rows' '$clustering_distance_rows' '$clustering_method_rows' '$row_dend_side' '$row_dend_width' '$row_sorted' '$show_row_names' '$row_names_side' '$row_names_size' '$row_names_rot' '$cluster_columns' '$clustering_distance_columns' '$clustering_method_columns' '$column_dend_side' '$column_dend_height' '$column_sorted' '$show_column_names' '$column_names_side' '$column_names_size' '$column_names_rot' '$anno_param_row_pheno{'show'}' '$anno_param_row_pheno{'width'}' '$anno_param_row_pheno{'border'}' '$anno_param_row_pheno{'name_size'}' '$anno_param_row_pheno{'name_rot'}' '$anno_param_row_pheno{'name_side'}' '$anno_param_column_region{'show'}' '$anno_param_column_region{'height'}' '$anno_param_column_region{'border'}' '$anno_param_column_region{'name_size'}' '$anno_param_column_region{'name_rot'}' '$anno_param_column_region{'name_side'}' '$anno_param_row_stat{'show'}' '$anno_param_row_stat{'width'}' '$anno_param_row_stat{'border'}' '$anno_param_row_stat{'title'}' '$anno_param_row_stat{'title_size'}' '$anno_param_row_stat{'title_side'}' '$anno_param_row_stat{'title_rot'}' '$anno_param_row_stat{'axis_side'}'  '$anno_param_row_stat{'axis_labels_size'}' '$anno_param_column_stat{'show'}' '$anno_param_column_stat{'height'}' '$anno_param_column_stat{'border'}' '$anno_param_column_stat{'title'}' '$anno_param_column_stat{'title_size'}' '$anno_param_column_stat{'title_side'}' '$anno_param_column_stat{'title_rot'}' '$anno_param_column_stat{'axis_side'}' '$anno_param_column_stat{'axis_labels_size'}' '$legend_side' '$legend_title' '$legend_title_size' '$legend_text_size' '$legend_grid_size' '$use_raster'  1>/dev/null  ");
+
 
 
 }

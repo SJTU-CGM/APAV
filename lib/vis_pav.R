@@ -18,18 +18,14 @@ if (!require("APAVplot", quietly = TRUE))
 library(APAVplot)
 
 ################### Construct a PAV object
-pav_data <- read.table(pavdata, header = T, comment.char = "#", sep = "\t")
+pav_data <- read.table(pavdata, header = T, comment.char = "#", sep = "\t", check.names = F)
 
 myregion <- pav_data[, 1:4]
 rownames(myregion) <- pav_data$Annotation
 mypav <- pav_data[, 6:ncol(pav_data)]
 rownames(mypav) <- pav_data$Annotation
 
-if(length(which(rowSums(mypav) == 0)) > 0){
-  warning(paste0("Remove ", length(which(rowSums(mypav) == 0)), " regions (", paste0(rownames(mypav)[which(rowSums(mypav) == 0)], collapse = ",") ,") which are 0(absence) in all samples."))
-  mypav <- mypav[-which(rowSums(mypav) == 0),]
-}
-
+mypav <- check_region(mypav)
 
 if(phenodata == "NULL"){
   my_pav <- get_pav_obj(mypav, 
@@ -40,9 +36,9 @@ if(phenodata == "NULL"){
 			use_binomial = tobool(argv[9]),
                         softcore_p_value = as.numeric(argv[10]))
 }else{
-  mypheno <- read.table(phenodata, header=T)
+  mypheno <- read.table(phenodata, header=T, comment.char = "#", sep = "\t", quote = "")
   rownames(mypheno) <- mypheno[,1]
-  mypheno <- mypheno[,-1]
+  mypheno <- mypheno[, -1, drop = F]
   
   my_pav <- get_pav_obj(mypav, 
                         pheno_info = mypheno, 
@@ -78,7 +74,7 @@ if(command == "heatmap"){
   inlgtitle <- unlist(strsplit(argv[72], ","))
   if(!is.na(inlgtitle[1])) mylgtitle[[1]] <- inlgtitle[1]
   if(!is.na(inlgtitle[2])) mylgtitle[[2]] <- inlgtitle[2]
-  
+
    suppressMessages(pav_heatmap(my_pav,
               add_pheno_info = names(my_pav@sample$pheno),
 	      #add_region_info = "Chr",

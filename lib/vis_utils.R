@@ -21,4 +21,12 @@ numnull <- function(str){ if(str == "NULL") NULL else as.numeric(str) }
 breaksnull <- function(str){ if(str == "NULL") NULL else as.numeric(strsplit(str, ",")[[1]]) }
 labelsnull <- function(str){ if(str == "NULL") NULL else strsplit(str, ",")[[1]] }
 
-
+check_region <- function(data){
+  absence_sample_n <- length(which(rowSums(data) == 0))
+  if(absence_sample_n > 0){
+    suffix <- ifelse(absence_sample_n > 3, "...", "")
+    warning(paste0("Remove ", absence_sample_n, " regions (", paste0(rownames(data)[which(rowSums(data) == 0)][0:min(3,absence_sample_n)], collapse = ",") , suffix, ") which are 0(absence) in all samples."))
+    data <- data[-which(rowSums(data) == 0),]
+  }
+  return(data)
+}

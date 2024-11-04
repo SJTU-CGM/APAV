@@ -57,7 +57,6 @@ Options for PAV Determination:
 
 Options for the tracks in genome browser in PAV report:
   --fa                  <file>          Fasta file of reference genome.
-  --gff                 <file>          GFF file is used to add annotation tracks in the genome browser.
   --cpbam				Copy bam files instead of make symbolic links.
 
 
@@ -225,7 +224,6 @@ Options for PAV Determination:
 
 Options for the tracks in genome browser:
   --fa                  <file>          Fasta file of reference genome.
-  --gff                 <file>          GFF file is used to add annotation tracks in the genome browser.
   --cpbam                               Copy bam files instead of make symbolic links.
 
 

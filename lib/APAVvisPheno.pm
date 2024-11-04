@@ -99,7 +99,7 @@ Visualization options:
   --row_sorted                  <string>        The sorted row names, separated by commas.
                                                 It doesn't work when '--cluster_rows' is used.
 
-  --show_row_names                              Show row names.
+  --hide_row_names                              Hide row names.
   --row_names_side              <type>          The position of row names, 'left' or 'right'.
   --row_names_size              <numeric>       The size of row names.
   --row_names_rot               <numeric>       The rotation of row names.
@@ -116,7 +116,7 @@ Visualization options:
   --column_sorted               <string>        The sorted column names, separated by commas.
                                                 It doesn't work when '--cluster_columns'.
 
-  --show_column_names                           Show column names.
+  --hide_column_names                           hide column names.
   --column_names_side           <type>          The position of column names, 'top' or 'column'.
   --column_names_size           <numeric>       The size of column names.
   --column_names_rot            <numeric>       The rotation of column names.
@@ -160,7 +160,7 @@ Visualization options:
 	my $row_dend_width = 5;
 	my $row_sorted = "c()";
 
-	my $show_row_names = 0; ## F
+	my $hide_row_names = 0; ## F
 	my $row_names_side = "right";
 	my $row_names_size = 10;
 	my $row_names_rot = 0;
@@ -172,7 +172,7 @@ Visualization options:
 	my $column_dend_height = 5;
 	my $column_sorted = "c()";
 	
-	my $show_column_names = 0; ## F
+	my $hide_column_names = 0; ## F
 	my $column_names_side = "bottom";
 	my $column_names_size = 10;
 	my $column_names_rot = 90;
@@ -217,7 +217,7 @@ Visualization options:
 		'row_dend_width=f'		=> \$row_dend_width,
 		'row_sorted=s'			=> \$row_sorted,
 
-		'show_row_names!'		=> \$show_row_names,
+		'hide_row_names!'		=> \$hide_row_names,
 		'row_names_side=s'		=> \$row_names_side,
 		'row_names_size=f'		=> \$row_names_size,
 		'row_names_rot=f'		=> \$row_names_rot,
@@ -229,7 +229,7 @@ Visualization options:
 		'column_dend_height=f'		=> \$column_dend_height,
 		'column_sorted=s'		=> \$column_sorted,
 
-		'show_column_names!'		=> \$show_column_names,
+		'hide_column_names!'		=> \$hide_column_names,
 		'column_names_side=s'		=> \$column_names_side,
 		'column_names_size=f'		=> \$column_names_size,
 		'column_names_rot=f'		=> \$column_names_rot,
@@ -278,7 +278,7 @@ Visualization options:
         my $dir =  dirname(__FILE__);
         my $exec = $dir."/"."vis_pheno.R";
 
-	system("Rscript $exec $dir $pavdata 'NULL' '$out' heatmap '$phenores' '$fig_width' '$fig_height' '$p_threshold' '$adjust_p' '$only_show_significant' '$flip' '$p_colors' '$na_col' '$cell_border_color' '$region_info_color_list_str' '$cluster_rows' '$clustering_distance_rows' '$clustering_method_rows' '$row_dend_side' '$row_dend_width' '$row_sorted' '$show_row_names' '$row_names_side' '$row_names_size' '$row_names_rot' '$cluster_columns' '$clustering_distance_columns' '$clustering_method_columns' '$column_dend_side' '$column_dend_height' '$column_sorted' '$show_column_names' '$column_names_side' '$column_names_size' '$column_names_rot' '$anno_param_region{'show'}' '$anno_param_region{'width'}' '$anno_param_region{'border'}' '$anno_param_region{'name_size'}' '$anno_param_region{'name_rot'}' '$anno_param_region{'name_side'}' '$legend_side' '$legend_title' '$legend_title_size' '$legend_text_size' '$legend_grid_size' 1>/dev/null ");
+	system("Rscript $exec $dir $pavdata 'NULL' '$out' heatmap '$phenores' '$fig_width' '$fig_height' '$p_threshold' '$adjust_p' '$only_show_significant' '$flip' '$p_colors' '$na_col' '$cell_border_color' '$region_info_color_list_str' '$cluster_rows' '$clustering_distance_rows' '$clustering_method_rows' '$row_dend_side' '$row_dend_width' '$row_sorted' '$hide_row_names' '$row_names_side' '$row_names_size' '$row_names_rot' '$cluster_columns' '$clustering_distance_columns' '$clustering_method_columns' '$column_dend_side' '$column_dend_height' '$column_sorted' '$hide_column_names' '$column_names_side' '$column_names_size' '$column_names_rot' '$anno_param_region{'show'}' '$anno_param_region{'width'}' '$anno_param_region{'border'}' '$anno_param_region{'name_size'}' '$anno_param_region{'name_rot'}' '$anno_param_region{'name_side'}' '$legend_side' '$legend_title' '$legend_title_size' '$legend_text_size' '$legend_grid_size' 1>/dev/null ");
 
 }
 
@@ -323,7 +323,7 @@ Visualization options:
   --row_sorted                  <string>        The sorted row names, separated by commas.
                                                 It doesn't work when '--cluster_rows' is used.
 
-  --show_row_names                              Show row names.
+  --hide_row_names                              Hide row names.
   --row_names_side              <type>          The position of row names, 'left' or 'right'.
   --row_names_size              <numeric>       The size of row names.
   --row_names_rot               <numeric>       The rotation of row names.
@@ -340,7 +340,7 @@ Visualization options:
   --column_sorted               <string>        The sorted column names, separated by commas.
                                                 It doesn't work when '--cluster_columns'.
 
-  --show_column_names                           Show column names.
+  --hide_column_names                           Hide column names.
   --column_names_side           <type>          The position of column names, 'top' or 'column'.
   --column_names_size           <numeric>       The size of column names.
   --column_names_rot            <numeric>       The rotation of column names.
@@ -384,7 +384,7 @@ Visualization options:
         my $row_dend_width = 5;
         my $row_sorted = "c()";
 
-        my $show_row_names = 0; ## F
+        my $hide_row_names = 0; ## F
         my $row_names_side = "right";
         my $row_names_size = 10;
         my $row_names_rot = 0;
@@ -396,7 +396,7 @@ Visualization options:
         my $column_dend_height = 5;
         my $column_sorted = "c()";
         
-        my $show_column_names = 0; ## F
+        my $hide_column_names = 0; ## F
         my $column_names_side = "bottom";
         my $column_names_size = 10;
         my $column_names_rot = 90;
@@ -443,7 +443,7 @@ Visualization options:
                 'row_dend_width=f'              => \$row_dend_width,
                 'row_sorted=s'                  => \$row_sorted,
 
-                'show_row_names!'               => \$show_row_names,
+                'hide_row_names!'               => \$hide_row_names,
                 'row_names_side=s'              => \$row_names_side,
                 'row_names_size=f'              => \$row_names_size,
                 'row_names_rot=f'               => \$row_names_rot,
@@ -455,7 +455,7 @@ Visualization options:
                 'column_dend_height=f'          => \$column_dend_height,
                 'column_sorted=s'               => \$column_sorted,
 
-                'show_column_names!'            => \$show_column_names,
+                'hide_column_names!'            => \$hide_column_names,
                 'column_names_side=s'           => \$column_names_side,
                 'column_names_size=f'           => \$column_names_size,
                 'column_names_rot=f'            => \$column_names_rot,
@@ -505,7 +505,7 @@ Visualization options:
         my $dir =  dirname(__FILE__);
         my $exec = $dir."/"."vis_pheno.R";
 
-	system("Rscript $exec $dir $pavdata $phenodata '$out' block '$phenores' '$fig_width' '$fig_height' '$pheno_name' '$p_threshold' '$adjust_p' '$only_show_significant' '$flip' '$per_colors' '$na_col' '$cell_border_color' '$region_info_color_list_str' '$cluster_rows' '$clustering_distance_rows' '$clustering_method_rows' '$row_dend_side' '$row_dend_width' '$row_sorted' '$show_row_names' '$row_names_side' '$row_names_size' '$row_names_rot' '$cluster_columns' '$clustering_distance_columns' '$clustering_method_columns' '$column_dend_side' '$column_dend_height' '$column_sorted' '$show_column_names' '$column_names_side' '$column_names_size' '$column_names_rot' '$anno_param_region{'show'}' '$anno_param_region{'width'}' '$anno_param_region{'border'}' '$anno_param_region{'name_size'}' '$anno_param_region{'name_rot'}' '$anno_param_region{'name_side'}' '$legend_side' '$legend_title' '$legend_title_size' '$legend_text_size' '$legend_grid_size' 1>/dev/null ");
+	system("Rscript $exec $dir $pavdata $phenodata '$out' block '$phenores' '$fig_width' '$fig_height' '$pheno_name' '$p_threshold' '$adjust_p' '$only_show_significant' '$flip' '$per_colors' '$na_col' '$cell_border_color' '$region_info_color_list_str' '$cluster_rows' '$clustering_distance_rows' '$clustering_method_rows' '$row_dend_side' '$row_dend_width' '$row_sorted' '$hide_row_names' '$row_names_side' '$row_names_size' '$row_names_rot' '$cluster_columns' '$clustering_distance_columns' '$clustering_method_columns' '$column_dend_side' '$column_dend_height' '$column_sorted' '$hide_column_names' '$column_names_side' '$column_names_size' '$column_names_rot' '$anno_param_region{'show'}' '$anno_param_region{'width'}' '$anno_param_region{'border'}' '$anno_param_region{'name_size'}' '$anno_param_region{'name_rot'}' '$anno_param_region{'name_side'}' '$legend_side' '$legend_title' '$legend_title_size' '$legend_text_size' '$legend_grid_size' 1>/dev/null ");
 
 }
 
@@ -535,7 +535,7 @@ Visualization Settings:
 
   --point_size 		<numeric>	The size of points.
   --x_text_size 	<numeric>	The size of tick labels on x-axis.
-  --x_text_angle	<numeric>	The angle of tick labels, ranging from 0 to 1.
+  --x_text_angle	<numeric>	The angle of tick labels.
   --x_title_size 	<numeric>	The size of x-axis title.
   --y_text_size 	<numeric>	The size of tick labels on y-axis.
   --y_title_size 	<numeric>	The size of y-axis title.
