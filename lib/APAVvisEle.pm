@@ -51,6 +51,7 @@ Visualization options:
   --gene_colors			<colors>	The colors of gene elements, separated by commas.
                                                 The colors are assigned to 'transcript', 'exon', 'CDS', 'five_prime_UTR' and 'three_prime_UTR'.
   --pheno_info_color_list       <key=value>     The colors of phenotype annotations. (eg: 'gender=blue,green')
+  --pheno_border		<color>		The color of cell borders in the phenotype annotation.
 
   --seq_name_size               <numeric>       The size of sequence name.
   --loc_name_size               <numeric>       The size of coordinate numbers.
@@ -91,6 +92,7 @@ Visualization options:
 
         my $gene_colors = "gray70,gray85,#d77478,#ecbf40,#ecbf40";
         my (%pheno_info_color_list, $pheno_info_color_list_str);
+	my $pheno_border = "NA";
 
         my $seq_name_size = "NULL";
         my $loc_name_size = "NULL";
@@ -130,6 +132,7 @@ Visualization options:
                 
                 'gene_colors=s'         => \$gene_colors,
                 'pheno_info_color_list=s'       => \%pheno_info_color_list,
+		'pheno_border=s'	=> \$pheno_border,
 
                 'seq_name_size=f'       => \$seq_name_size,
                 'loc_name_size=f'       => \$loc_name_size,
@@ -199,7 +202,7 @@ Visualization options:
 	my $dir =  dirname(__FILE__);
         my $exec = $dir."/"."vis_ele.R";
 
-	system("Rscript $exec $dir '$eledata' '$ele_region' '$out' '$phenodata' '$gffdata' depth '$out_depth' '$fig_width' '$fig_height' '$cluster' '$clustering_distance' '$clustering_method' '$log10' '$top_anno_height' '$left_anno_width' '$ele_color' '$depth_colors' '$lowlight_colors' '$gene_colors' '$pheno_info_color_list_str' '$seq_name_size' '$loc_name_size' '$hide_sample_name' '$sample_name_size' '$legend_title' '$legend_title_size' '$legend_text_size' 1>/dev/null ");
+	system("Rscript $exec $dir '$eledata' '$ele_region' '$out' '$phenodata' '$gffdata' depth '$out_depth' '$fig_width' '$fig_height' '$cluster' '$clustering_distance' '$clustering_method' '$log10' '$top_anno_height' '$left_anno_width' '$ele_color' '$depth_colors' '$lowlight_colors' '$gene_colors' '$pheno_info_color_list_str' '$pheno_border' '$seq_name_size' '$loc_name_size' '$hide_sample_name' '$sample_name_size' '$legend_title' '$legend_title_size' '$legend_text_size' 1>/dev/null ");
 	
 
 }
@@ -262,9 +265,11 @@ Visualization options:
   --ele_color                   <color>         The color of element regions.
   --ele_line_color              <color>         The color for the line pointing to elements.
   --pav_colors                  <colors>        The colors for presence and absence, separated by commas.
+  --cell_border			<color>		The color of cell borders in the heat map.
   --gene_colors                 <colors>        The colors for gene elements, separated by commas.
                                                 The colors are assigned to 'transcript', 'exon', 'CDS', 'five_prime_UTR' and 'three_prime_UTR'.
   --pheno_info_color_list       <key=value>     The colors for phenotype annotations. (eg: 'gender=blue,green')
+  --pheno_border		<color>		The color of cell borders in the phenotype annotation.
 
   --seq_name_size               <numeric>       The size of sequence name.
   --loc_name_size               <numeric>       The size of coordinate numbers.
@@ -302,8 +307,10 @@ Visualization options:
         my $ele_color = "#A6CEE3";
         my $ele_line_color = "gray";
         my $pav_colors = "#5680ae,gray90";
+	my $cell_border = "NA";
         my $gene_colors = "gray70,gray85,#d77478,#ecbf40,#ecbf40";
         my (%pheno_info_color_list, $pheno_info_color_list_str);
+	my $pheno_border = "NA";
 
         my $seq_name_size = "NULL";
         my $loc_name_size = "NULL";
@@ -340,8 +347,10 @@ Visualization options:
                 'ele_color=s'           => \$ele_color,
                 'ele_line_color=s'      => \$ele_line_color,
                 'pav_colors=s'          => \$pav_colors,
+		'cell_border=s'		=> \$cell_border,
                 'gene_colors=s'         => \$gene_colors,
                 'pheno_info_color_list=s'       => \%pheno_info_color_list,
+		'pheno_border=s'	=> \$pheno_border,		
 
                 'seq_name_size=f'       => \$seq_name_size,
                 'loc_name_size=f'       => \$loc_name_size,
@@ -387,7 +396,7 @@ Visualization options:
         my $dir =  dirname(__FILE__);
         my $exec = $dir."/"."vis_ele.R";
 
-        system("Rscript $exec $dir '$eledata' '$ele_region' '$out' '$phenodata' '$gffdata' pav '$fig_width' '$fig_height' '$cluster' '$clustering_distance' '$clustering_method' '$top_anno_height' '$left_anno_width' '$ele_color' '$ele_line_color' '$pav_colors' '$gene_colors' '$pheno_info_color_list_str' '$seq_name_size' '$loc_name_size' '$hide_ele_name' '$ele_name_size' '$ele_name_rot' '$hide_sample_name' '$sample_name_size' '$legend_title_size' '$legend_text_size' 1>/dev/null \n");
+        system("Rscript $exec $dir '$eledata' '$ele_region' '$out' '$phenodata' '$gffdata' pav '$fig_width' '$fig_height' '$cluster' '$clustering_distance' '$clustering_method' '$top_anno_height' '$left_anno_width' '$ele_color' '$ele_line_color' '$pav_colors' '$cell_border' '$gene_colors' '$pheno_info_color_list_str' '$pheno_border' '$seq_name_size' '$loc_name_size' '$hide_ele_name' '$ele_name_size' '$ele_name_rot' '$hide_sample_name' '$sample_name_size' '$legend_title_size' '$legend_text_size' 1>/dev/null \n");
 
 
 }
@@ -424,9 +433,11 @@ Visualization options:
   --ele_color			<color>		The color of element regions.
   --ele_line_color		<color>		The color for the line pointing to elements.
   --cov_colors			<colors>	The colors for coverage, separated by commas.
+  --cell_border			<color>		The color of cell borders in the heat map.
   --gene_colors			<colors>	The colors for gene elements, separated by commas.
   						The colors are assigned to 'transcript', 'exon', 'CDS', 'five_prime_UTR' and 'three_prime_UTR'.
   --pheno_info_color_list	<key=value>	The colors for phenotype annotations. (eg: 'gender=blue,green')
+  --pheno_border		<color>		The color of cell borders in the phenotype annotation.
 
   --seq_name_size		<numeric>	The size of sequence name.
   --loc_name_size		<numeric>	The size of coordinate numbers.
@@ -464,9 +475,11 @@ Visualization options:
 	my $ele_color = "#A6CEE3";
 	my $ele_line_color = "gray";
 	my $cov_colors = "#5680ae,gray90";
+	my $cell_border = "NA";
 	my $gene_colors = "gray70,gray85,#d77478,#ecbf40,#ecbf40";
 	my (%pheno_info_color_list, $pheno_info_color_list_str);
-	
+	my $pheno_border = "NA";
+
 	my $seq_name_size = "NULL";
 	my $loc_name_size = "NULL";
 
@@ -501,8 +514,10 @@ Visualization options:
 		'ele_color=s'		=> \$ele_color,
 		'ele_line_color=s'	=> \$ele_line_color,
 		'cov_colors=s'		=> \$cov_colors,
+		'cell_border=s'		=> \$cell_border,
 		'gene_colors=s'		=> \$gene_colors,
 		'pheno_info_color_list=s'	=> \%pheno_info_color_list,
+		'pheno_border=s'	=> \$pheno_border,
 	
 		'seq_name_size=f'	=> \$seq_name_size,
 		'loc_name_size=f'	=> \$loc_name_size,
@@ -548,7 +563,7 @@ Visualization options:
         my $dir =  dirname(__FILE__);
         my $exec = $dir."/"."vis_ele.R";
 
-	system("Rscript $exec $dir '$eledata' '$ele_region' '$out' '$phenodata' '$gffdata' cov '$fig_width' '$fig_height' '$cluster' '$clustering_distance' '$clustering_method' '$top_anno_height' '$left_anno_width' '$ele_color' '$ele_line_color' '$cov_colors' '$gene_colors' '$pheno_info_color_list_str' '$seq_name_size' '$loc_name_size' '$hide_ele_name' '$ele_name_size' '$ele_name_rot' '$hide_sample_name' '$sample_name_size' '$legend_title_size' '$legend_text_size' 1>/dev/null \n");
+	system("Rscript $exec $dir '$eledata' '$ele_region' '$out' '$phenodata' '$gffdata' cov '$fig_width' '$fig_height' '$cluster' '$clustering_distance' '$clustering_method' '$top_anno_height' '$left_anno_width' '$ele_color' '$ele_line_color' '$cov_colors' '$cell_border' '$gene_colors' '$pheno_info_color_list_str' '$pheno_border' '$seq_name_size' '$loc_name_size' '$hide_ele_name' '$ele_name_size' '$ele_name_rot' '$hide_sample_name' '$sample_name_size' '$legend_title_size' '$legend_text_size' 1>/dev/null \n");
 
 
 }
