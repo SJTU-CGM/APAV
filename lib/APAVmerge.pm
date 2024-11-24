@@ -101,7 +101,7 @@ Options:
 	close(PAV);
 	close(OUT);
 
-	my $etime = `date`;
+	my $etime = `date +"%Y-%m-%d %H:%M:%S"`;
         chomp($etime);
         print STDOUT "[-- ".$etime." --] apav mergeElePAV is finished\n";
 
@@ -158,7 +158,7 @@ Options:
 
 	mergecov($cov, $out, $asgene);
 
-	my $etime = `date`;
+	my $etime = `date +"%Y-%m-%d %H:%M:%S"`;
         chomp($etime);
         print STDOUT "[".$etime."] [mergeElecov] Finished\n";
 }

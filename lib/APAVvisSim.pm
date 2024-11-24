@@ -23,8 +23,8 @@ Visualization Options:
   
   --chart_type		<type>		Chart type. It should be one of 'errorbar', 'jitter' and 'ribbon'.
   					(Default:'ribbon')
-  --data_type		<type>		The type of data displayed. It should be 'count' or 'change'.
-  					(Default: 'count')
+  --data_type		<type>		The type of data displayed. It should be 'total' or 'increasing'.
+  					(Default: 'total')
 
   --fig_width		<numeric>	The width of the figure.
   --fig_height		<numeric>	The height of the figure.
@@ -69,7 +69,7 @@ Visualization Options:
 	my ($simdata, $out, $help);
 	
 	my $chart_type = "ribbon";
-	my $data_type = "count";
+	my $data_type = "total";
 
 	my $fig_width = 6;
 	my $fig_height = 4;

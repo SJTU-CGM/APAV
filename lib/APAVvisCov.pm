@@ -25,7 +25,6 @@ Visualization options:
 
   --cov_colors			<colors>	The colors for coverage, separated by commas.
   						(Default: 'white,#F8766D')
-  --region_info_color_list	<key=value>	The colors for region annotations. (eg: 'chr=black,red')
   --pheno_info_color_list	<key=value>	The colors for phenotype annotations. (eg: 'gender=blue,green')
 
   --border					Draw border for main heatmap. 
@@ -102,7 +101,7 @@ Visualization options:
 
   -h, --help					Print usage page.
 
-Warning: --region_info_color_list --pheno_info_color_list --anno_param_row_phen --anno_param_column_region --anno_param_row_stat --anno_param_column_stat can be added multiple times.
+Warning: --pheno_info_color_list --anno_param_row_phen --anno_param_column_region --anno_param_row_stat --anno_param_column_stat can be added multiple times.
   eg: --anno_param_row_pheno show=T --anno_param_row_pheno width=5 --anno_param_row_pheno name_rot=90
   \n";
 

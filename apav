@@ -26,7 +26,7 @@ Available commands:
         
     Calculate coverage:
 	staCov			Calculate coverage of target regions
-	mergeElecov		Merge neighboring elements with the same coverage
+	mergeEleCov		Merge neighboring elements with the same coverage
 	covPlotHeat		Plot a heatmap to give an overview of the coverage profile across samples
         
     Determine PAV:
@@ -69,7 +69,7 @@ my %commands = (
 	"generalBatch"		=> 0,
 	"gff2bed"		=> 0,
 	"staCov"		=> 0,
-	"mergeElecov"		=> 0,
+	"mergeEleCov"		=> 0,
 	"callPAV"		=> 0,
 	"gFamPAV"		=> 0,
 	"mergeElePAV"		=> 0,
@@ -109,7 +109,7 @@ if($commands{"geneBatch"}){
 	APAVgff2bed::gff2bed(@ARGV);
 }elsif($commands{"staCov"}){
 	APAVstaCov::staCov(@ARGV);
-}elsif($commands{"mergeElecov"}){
+}elsif($commands{"mergeEleCov"}){
 	APAVmerge::mergeElecov(@ARGV);
 }elsif($commands{"callPAV"}){
 	APAVcallPAV::callPAV(@ARGV);

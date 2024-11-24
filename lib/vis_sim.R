@@ -47,8 +47,8 @@ plot_sim(sim_data,
          jitter_point_color = strnull(argv[30]),
          
          path_size = as.numeric(argv[31]),
-         path_color = strnull(argv[32]),
-         ribbon_fill = strnull(argv[33]),
+         path_color = labelsnull(argv[32]),
+         ribbon_fill = labelsnull(argv[33]),
          ribbon_alpha = as.numeric(argv[34]))
 dev.off()
 

@@ -323,6 +323,7 @@ Visualization options:
   --color		<color>		The color for halfviolin.
   --pheno_info_colors	<colors>	The colors for the phenotype groups, separated by commas.
   
+  --y_title		<string>	The text for the y-axis title.
   --x_text_size		<numeric>	The size of tick labels on the x-axis.
   --y_text_size		<numeric>	The size of tick labels on the y-axis.
   --x_title_size	<numeric>	The size of x-axis title.
@@ -340,6 +341,7 @@ Visualization options:
 	my $color = "#7e9bc0";
 	my $pheno_info_colors = "NULL";
 
+	my $y_title = "Target Region Number";
 	my $x_text_size = "NULL";
 	my $y_text_size = "NULL";
 	my $x_title_size = "NULL";
@@ -358,6 +360,7 @@ Visualization options:
 		'add_pheno_info=s'	=> \$add_pheno_info,
 		'pheno_info_colors=s'	=> \$pheno_info_colors,
 		
+		'y_title=s'		=> \$y_title,
 		'x_text_size=f'		=> \$x_text_size,
 		'y_text_size=f'		=> \$y_text_size,
 		'x_title_size=f'	=> \$x_title_size,
@@ -379,7 +382,7 @@ Visualization options:
         my $dir =  dirname(__FILE__);
         my $exec = $dir."/"."vis_pav.R";
 
-	system("Rscript $exec $dir $pavdata $phenodata $out halfviolin '0' '0' '0.1' '0' '0.05' '$fig_width' '$fig_height' '$color' '$add_pheno_info' '$pheno_info_colors' '$x_text_size' '$y_text_size' '$x_title_size' '$y_title_size' 1>/dev/null ");
+	system("Rscript $exec $dir $pavdata $phenodata $out halfviolin '0' '0' '0.1' '0' '0.05' '$fig_width' '$fig_height' '$color' '$add_pheno_info' '$pheno_info_colors' '$y_title' '$x_text_size' '$y_text_size' '$x_title_size' '$y_title_size' 1>/dev/null ");
 
 }
 
@@ -514,7 +517,6 @@ Visualization options:
 
   --pav_colors			<colors>  	The colors for presence and absence, separated by commas.
   --type_colors 		<colors>	The colors for classifications of the region, separated by commas.
-  --region_info_color_list 	<key=value>     The colors for region annotations. (eg: 'chr=black,red')
   --pheno_info_color_list 	<key=value>     The colors for phenotype annotations. (eg: 'gender=blue,green')
   
   --hide_border 				Hide border of blocks in heatmap.
@@ -594,7 +596,7 @@ Visualization options:
 
   -h, --help                                    Print usage page.
 
-Warning: --region_info_color_list --pheno_info_color_list --anno_param_row_phen --anno_param_column_region --anno_param_row_stat --anno_param_column_stat can be added multiple 
+Warning: --pheno_info_color_list --anno_param_row_phen --anno_param_column_region --anno_param_row_stat --anno_param_column_stat can be added multiple 
 times.
   eg: --anno_param_row_pheno show=T --anno_param_row_pheno width=5 --anno_param_row_pheno name_rot=90
   

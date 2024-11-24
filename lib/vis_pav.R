@@ -184,10 +184,11 @@ if(command == "heatmap"){
                  violin_color = argv[13],
                  add_pheno_info = argv[14],
                  pheno_info_color_list = mycolor,
-                 x_text_size  = numnull(argv[16]),
-                 y_text_size = numnull(argv[17]),
-                 x_title_size = numnull(argv[18]),
-                 y_title_size = numnull(argv[19]))
+		 y_title = strnull(argv[16]),
+                 x_text_size  = numnull(argv[17]),
+                 y_text_size = numnull(argv[18]),
+                 x_title_size = numnull(argv[19]),
+                 y_title_size = numnull(argv[20]))
   
 }else if(command == "stackbar"){
   

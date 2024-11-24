@@ -394,7 +394,7 @@ sub sim_analysis {
 
         printLog("[pavPlotSim] Plot the growth curve of genome simulation...");
         system("$c pavPlotSim --simout ${out}/simulation/${out}_all.simout --y_title \"Gene Number\" --out ${out}/simulation/${out}_sim_curve ");
-        system("$c pavPlotSim --simout ${out}/simulation/${out}_all.simout --y_title \"Gene Number\" --out ${out}/simulation/${out}_sim_curve_delta --data_type change");
+        system("$c pavPlotSim --simout ${out}/simulation/${out}_all.simout --y_title \"Gene Number\" --out ${out}/simulation/${out}_sim_curve_delta --data_type increasing");
 }
 
 sub cov_analysis {

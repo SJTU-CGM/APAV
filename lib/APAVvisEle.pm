@@ -175,7 +175,12 @@ Visualization options:
         }
 
 
-        my ($chr, $start, $end) = get_ele_range($eledata);
+        my ($chr, $ele_start, $ele_end) = get_ele_range($eledata);
+	my ($gff_chr, $gff_start, $gff_end) = get_gene_range($gffdata);
+
+	die "Please check the GFF file, the chromosome should be the same as the element data\n" if($gff_chr ne $chr);
+	my $start = min($ele_start, $gff_start);
+	my $end = max($ele_end, $gff_end);
 
         $bam_dir.="/" unless($bam_dir=~/\/$/);
         my @bams = <$bam_dir*.bam>;
@@ -231,6 +236,25 @@ sub get_ele_range{
         chomp($end);
 
         return ($chr, $start, $end);
+}
+
+sub get_gene_range{
+	
+	my ($gffdata) = @_;
+
+	my @ccol = `cut -f 1 $gffdata | uniq`;
+	my @scol = `cut -f 4 $gffdata`;
+	my @ecol = `cut -f 5 $gffdata`;
+	die "Please check the gff data, all regions should be located on one sequence\n" if($#ccol > 0);
+	my $chr = $ccol[0];
+	chomp($chr);
+
+	my $start = min(@scol);
+	my $end = max(@ecol);
+	chomp($start);
+	chomp($end);
+
+	return ($chr, $start, $end);
 }
 
 
