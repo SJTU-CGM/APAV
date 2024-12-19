@@ -13,7 +13,7 @@ library(APAVplot)
 sim_data <- read.table(data, header = T, sep = "\t")
 
 pdf(file = paste0(out, ".pdf"), width = as.numeric(argv[35]), height = as.numeric(argv[36]))
-plot_sim(sim_data,
+plot_size(sim_data,
          chart_type = argv[4],
          data_type = argv[5],
          

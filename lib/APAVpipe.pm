@@ -385,16 +385,16 @@ sub sim_analysis {
 
 	my ($c, $out) = @_;
 
-	system("mkdir ${out}/simulation");
+	system("mkdir ${out}/estimation");
 
-        system("$c pavSim --pav ${out}/${out}_all.pav --out ${out}/simulation/${out}_all.simout");
+        system("$c pavSize --pav ${out}/${out}_all.pav --out ${out}/estimation/${out}_all.size");
 
         die "Please install R first\n" if(system("command -v Rscript > /dev/null 2>&1") != 0);
 	die "Please install 'APAVplot' R package first\n" if(system("Rscript -e 'library(APAVplot)' > /dev/null 2>&1") != 0);
 
-        printLog("[pavPlotSim] Plot the growth curve of genome simulation...");
-        system("$c pavPlotSim --simout ${out}/simulation/${out}_all.simout --y_title \"Gene Number\" --out ${out}/simulation/${out}_sim_curve ");
-        system("$c pavPlotSim --simout ${out}/simulation/${out}_all.simout --y_title \"Gene Number\" --out ${out}/simulation/${out}_sim_curve_delta --data_type increasing");
+        printLog("[pavPlotSize] Plot the growth curve of genome estimation...");
+        system("$c pavPlotSize --size ${out}/estimation/${out}_all.size --y_title \"Gene Number\" --out ${out}/estimation/${out}_size_curve ");
+        system("$c pavPlotSize --size ${out}/estimation/${out}_all.size --y_title \"Gene Number\" --out ${out}/estimation/${out}_size_curve_delta --data_type increasing");
 }
 
 sub cov_analysis {

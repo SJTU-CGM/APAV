@@ -11,10 +11,10 @@ use File::Basename;
 
 sub simPlotCurve{
 
-	my $usage = "\n\tUsage: apav pavPlotSim -i <sim_output_file> [options]
+	my $usage = "\n\tUsage: apav pavPlotSize -i <estimation_output_file> [options]
 	
 Necessary input desription:
-  -i, --simout		<file>		Result file produced by command 'apav sim'.
+  -i, --size		<file>		Result file produced by command 'apav pavSize'.
 
 Option:
   -o, --out		<string>	Figure name.
@@ -109,7 +109,7 @@ Visualization Options:
     	my $ribbon_alpha = 0.5;
 
 	GetOptions(
-		'simout|i=s'	=> \$simdata,
+		'size|i=s'	=> \$simdata,
 		'out|o=s'	=> \$out,
 
 		'chart_type=s'	=> \$chart_type,
@@ -158,12 +158,12 @@ Visualization Options:
 	die $usage if !defined($simdata);
 
 	die $usage if $help;
-	APAVutils::check_file('--simout/-i', $simdata);
+	APAVutils::check_file('--size/-i', $simdata);
 	my $head = `grep -v '#' $simdata | head -n 1`;
 	if($head ne "Round\tSampleN\tCore\tPan\tDelta\n" && $head ne "Round\tSampleN\tCore\tPan\tDelta\tGroup\n"){
-		die "Please make sure the input file is produced by command 'apav pavSim'\n";
+		die "Please make sure the input file is produced by command 'apav pavSize'\n";
 	}
-	$out = APAVutils::check_out($out, $simdata, "_sim_curve");
+	$out = APAVutils::check_out($out, $simdata, "_size_curve");
 
 	die "Please install R first\n" if(system("command -v Rscript > /dev/null 2>&1") != 0);
 	die "Please install 'APAVplot' R package first\n" if(system("Rscript -e 'library(APAVplot)' > /dev/null 2>&1") != 0);

@@ -121,9 +121,9 @@ sub printBlock{
 
 sub mergeElecov{
 
-	my $usage = "\n\tUsaege: apav mergeElecov --elecov <elecov_file> [options]
+	my $usage = "\n\tUsaege: apav mergeEleCov --elecov <elecov_file> [options]
 
-'apav merge' is used to merge neighboring elements with the same coverage.
+'apav mergeEleCov' is used to merge neighboring elements with the same coverage.
 
 Necessary input description:
   -i, --elecov  <file>	        Element coverage file.

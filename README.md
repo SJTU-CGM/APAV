@@ -71,8 +71,8 @@ Available commands:
         mergeElePAV             Merge neighboring elements with the same PAV
 
     Estimate genome size:
-        pavSim                  Simulate the size of pan-genome and core-genome from the PAV table
-        pavPlotSim              Draw growth curve of genome simulation
+        pavSize			Estimate the size of pan-genome and core-genome from the PAV table
+        pavPlotSize		Draw estimated growth curves
 
     PAV analysis:
         pavPlotStat             Plot a half-violin chart to show the number of regions in each group of samples
@@ -155,16 +155,16 @@ apav gFamPAV --pav demo1_all.pav --fam demo1_gene.fam
 ```
 	
 #### 5. Genome size estimation
-Based on the PAV table, you can use the `pavSim` command to estimate genome size by simulating the size of the pan-genome and core-genome.
+Based on the PAV table, you can use the `pavSize` command to estimate genome size by simulating the size of the pan-genome and core-genome.
 ```
-apav pavSim --pav demo1_all.pav
-## Simulation in groups
+apav pavSize --pav demo1_all.pav
+## Estimation in groups
 cat demo_sample.pheno | cut -f 1,2 > demo_sample.group
-apav pavSim --pav demo1_all.pav --group demo_sample.group
+apav pavSize --pav demo1_all.pav --group demo_sample.group
 ```
-The `pavPlotSim` command can draw the growth curve of genome simulation.
+The `pavPlotSize` command can draw the growth curve of genome estimate.
 ```
-apav pavPlotSim --simout demo1_all.simout
+apav pavPlotSize --sizeout demo1_all.sizeout
 ```
 
 #### 6. Common PAV analysis and visulization

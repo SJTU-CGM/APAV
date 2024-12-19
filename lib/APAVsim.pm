@@ -10,22 +10,22 @@ use List::Util qw/sum/;
 
 sub sim{
 
-	my $usage = "\n\tUsage: apav pavSim --pav <pav_file> [options]
+	my $usage = "\n\tUsage: apav pavSize --pav <pav_file> [options]
 
-'apav sim' is used to simulate the size of pan-genome and core-genome from PAV table.
+'apav pavSize' is used to estimate the size of pan-genome and core-genome from PAV table.
 
 Necessary input description:
   -i, --pav     <file>	        PAV file.
 
 Options:
   -o, --out     <string>        Output file name.
-  -n 		<int>		Specifies the number of random sampling times for simulation. 
+  -n 		<int>		Specifies the number of random sampling times. 
   				(Default:100)
   --group	<file>		Group file for samples.
   -h, --help                    Print usage page.
   \n";
 
-  	 my $cmdline = $0. " pavSim";
+  	 my $cmdline = $0. " pavSize";
         $cmdline .= " ".join(" ", @ARGV);
 
         my $stime = `date +"%Y-%m-%d %H:%M:%S"`;
@@ -45,12 +45,12 @@ Options:
 	die $usage if $help;
 	APAVutils::check_file('--pav/-i', $pav);
 	APAVutils::check_file('--group', $group_file) if defined($group_file);
-	$out = APAVutils::check_out($out, $pav, ".simout");
+	$out = APAVutils::check_out($out, $pav, ".size");
 
 	open(PAV, "<$pav") or die "Could not open file '$pav'\n";
 	open(OUT, ">$out") or die "Could not open file '$out'\n";
 
-	print STDOUT "[".$stime."] [pavSim] Simulate the size of pan-genome and core-genome from PAV table....\n";
+	print STDOUT "[".$stime."] [pavSize] Estimate the size of pan-genome and core-genome from PAV table....\n";
 
         print OUT "##Date: $stime\n";
         print OUT "##CMDline: $cmdline\n";
@@ -146,7 +146,7 @@ Options:
 		}
 		
 		if($#table eq -1){
-			die "Can not find dispensable region for simulation.\n";
+			die "Can not find dispensable region for estimation.\n";
 		}else{
 			print OUT "Round\tSampleN\tCore\tPan\tDelta\n";
 			simprint($number, $sample_n, \@table, $allp);
@@ -157,7 +157,7 @@ Options:
 
 	my $etime = `date +"%Y-%m-%d %H:%M:%S"`;
         chomp($etime);
-        print STDOUT "[".$etime."] [pavSim] Finished\n";
+        print STDOUT "[".$etime."] [pavSize] Finished\n";
 
 }
 

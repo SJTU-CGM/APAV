@@ -35,8 +35,8 @@ Available commands:
 	mergeElePAV		Merge neighboring elements with the same PAV
 
     Estimate genome size:
-	pavSim			Simulate the size of pan-genome and core-genome from the PAV table
-	pavPlotSim		Draw growth curve of genome simulation
+	pavSize			Estimate the size of pan-genome and core-genome from the PAV table
+	pavPlotSize		Draw estimated growth curves
 
     PAV analysis:
 	pavPlotStat		Plot a half-violin chart to show the number of regions in each group of samples
@@ -73,8 +73,8 @@ my %commands = (
 	"callPAV"		=> 0,
 	"gFamPAV"		=> 0,
 	"mergeElePAV"		=> 0,
-	"pavSim"		=> 0,
-	"pavPlotSim"		=> 0,
+	"pavSize"		=> 0,
+	"pavPlotSize"		=> 0,
 	"covPlotHeat"		=> 0,
 	"pavPlotStat"		=> 0,
 	"pavPlotHist"		=> 0,
@@ -117,9 +117,9 @@ if($commands{"geneBatch"}){
 	APAVgfPAV::gfpav(@ARGV);
 }elsif($commands{"mergeElePAV"}){
 	APAVmerge::mergeElePAV(@ARGV);
-}elsif($commands{"pavSim"}){
+}elsif($commands{"pavSize"}){
         APAVsim::sim(@ARGV);
-}elsif($commands{"pavPlotSim"}){
+}elsif($commands{"pavPlotSize"}){
         APAVvisSim::simPlotCurve(@ARGV);
 }elsif($commands{"covPlotHeat"}){
         APAVvisCov::covPlotHeat(@ARGV);
