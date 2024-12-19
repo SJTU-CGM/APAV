@@ -176,11 +176,17 @@ Visualization options:
 
 
         my ($chr, $ele_start, $ele_end) = get_ele_range($eledata);
-	my ($gff_chr, $gff_start, $gff_end) = get_gene_range($gffdata);
+	my ($start, $end);
 
-	die "Please check the GFF file, the chromosome should be the same as the element data\n" if($gff_chr ne $chr);
-	my $start = min($ele_start, $gff_start);
-	my $end = max($ele_end, $gff_end);
+	if($gffdata ne "NULL"){
+		my ($gff_chr, $gff_start, $gff_end) = get_gene_range($gffdata);
+		die "Please check the GFF file, the chromosome should be the same as the element data\n" if($gff_chr ne $chr);
+		$start = min($ele_start, $gff_start);
+		$end = max($ele_end, $gff_end);
+	}else{
+		$start = $ele_start;
+		$end = $ele_end;
+	}
 
         $bam_dir.="/" unless($bam_dir=~/\/$/);
         my @bams = <$bam_dir*.bam>;
