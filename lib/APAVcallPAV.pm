@@ -40,7 +40,7 @@ Options for the tracks in genome browser:
   --fa                  <file>		Fasta file of reference genome.
   --gff                 <file>		GFF file is used to add annotation tracks in the genome browser.
   --bamdir          	<dir>		The directory contains mapping results (sorted '.bam' files and index files).
-  --cpbam				Copy bam files instead of make symbolic links. 
+  --slice				Extract the bam file of the target regions, otherwise make symbolic links for the raw bam file.
 
   -h, --help                    	Print usage page.
   \n";
@@ -51,13 +51,11 @@ Options for the tracks in genome browser:
         my $stime = `date +"%Y-%m-%d %H:%M:%S"`;
         chomp($stime);
 
-        my ($cov, $out_prefix, $help, $phen_file, $fa_file, $gff_file, $bam_dir);
+        my ($cov, $out_prefix, $help, $phen_file, $fa_file, $gff_file, $bam_dir, $slice);
 	my $method = "fixed";
 	my $thre = 0.5;
         my $min_absence = 0.1;
 	my $max_iter = 100;
-
-	my $cpbam = 0;
 
         GetOptions(
                 'cov|i=s'       => \$cov,
@@ -70,7 +68,7 @@ Options for the tracks in genome browser:
 		'fa=s'		=> \$fa_file,
 		'gff=s'		=> \$gff_file,
 		'bamdir=s'	=> \$bam_dir,
-		'cpbam' 	=> \$cpbam,
+		'slice!'	=> \$slice,
                 'help|h!'       => \$help
         ) or die $!."\n";
 
@@ -91,6 +89,7 @@ Options for the tracks in genome browser:
 	open(COV, "<$cov") or die "Could not open file '$cov'\n";
 	open(PAV, ">$out_prefix"."_all.pav") or die "Could not open file '${out_prefix}_all.pav'";
 	open(DIST, ">$out_prefix"."_dispensable.pav") or die "Could not open file '${out_prefix}_dispensable.pav'";
+	open(DATA, ">$out_dir"."data.json") or die "Could not open file '${out_dir}data.json'";
 	open(GREPORT, ">$out_dir"."PAV.html") or die "Could not open file '${out_dir}PAV.html'";
 	open(GBED, ">$out_dir"."target.bed") or die "Could not open file '${out_dir}target.bed'";
 	open(SREPORT, ">$out_dir"."sample.html") or die "Could not open file '${out_dir}sample.html'";
@@ -148,7 +147,7 @@ Options for the tracks in genome browser:
         system "cp -r ${Bin}/src/css ${out_dir}";
 
 	print STDOUT "-- Prepare data for web report\n";
-	printGeneReport(\@dtable, \@samples, $out_dir, $fa_file, $gff_file, $bam_dir, $cpbam);
+	printGeneReport(\@dtable, \@samples, $out_dir, $fa_file, $gff_file, $bam_dir, $slice);
 	print STDOUT "-- Generate web report for PAVs of dispensable regions\n";
 
 	my %p;
@@ -201,6 +200,7 @@ Options for the tracks in genome browser:
 	close(COV);
 	close(PAV);
 	close(DIST);
+	close(DATA);
 	close(GREPORT);
 	close(GBED);
 	close(SREPORT);
@@ -214,7 +214,7 @@ Options for the tracks in genome browser:
 }
 
 sub printGeneReport {
-	my ($dtable, $samples, $out_dir, $fa_file, $gff_file, $bam_dir, $cpbam) = @_;
+	my ($dtable, $samples, $out_dir, $fa_file, $gff_file, $bam_dir, $slice) = @_;
 	my @dtable = @$dtable;
 	my @lines = map{'"'.join('","', @$_).'"'} @dtable;
 
@@ -279,11 +279,11 @@ sub printGeneReport {
 		map{ $_ =~ s/.bam$//g }@samples;
 
 		print STDOUT "-- Add alignment tracks\n";
-		if($cpbam){
-			system "cp ${bam_dir}*.bam ${out_dir}browser/";
-        		system "cp ${bam_dir}*.bai ${out_dir}browser/";
-		}else{
-			foreach(@samples){
+		foreach(@samples){
+			if($slice){
+				system "samtools view -hb -L ${out_dir}target.bed ${bam_dir}${_}.bam > ${out_dir}browser/${_}.bam";
+				system "samtools index ${out_dir}browser/${_}.bam";
+			}else{
 				my $bam_real = Cwd::realpath("${bam_dir}${_}.bam");
 				system "ln -s $bam_real ${out_dir}browser/${_}.bam";
 				system "ln -s $bam_real.bai ${out_dir}browser/${_}.bam.bai";
@@ -299,13 +299,13 @@ sub printGeneReport {
                         })'
 	}
 
+	printf DATA '{"pav":[['.join('],[', @lines).']],';
 
 	my $greport = APAVreport::getPavReport(
 		$fa_flag,
 		$gff_flag,
 		'<th>'.join('</th><th>', @$samples).'</th>', 
 		'["'.join('","', @$samples).'"]', 
-		'[['.join('],[', @lines).']]', 
 		$bam_tracks);
 	printf GREPORT $greport;
 }
@@ -338,12 +338,12 @@ sub printSampleReport{
 		}
 	}
 
+	printf DATA '"gene":['.join(',', @target_arr).'],'.'"sample":['.join(',', @stable_arr).']}';
+
 	my $sreport = APAVreport::getSampleReport(
 		join('<br>', @input_phen), 
 		'<th>'.join("</th>\n            <th>", @$target_name).'</th>', 
 		join("\n", @phen_div), 
-		'['.join(',', @target_arr).']', 
-		'['.join(',', @stable_arr).']', 
 		'["'.join('", "', @phen_name).'"]',  
 		join("\n              ", @phen_init), 
 		join("\n                              ", @phen_draw));

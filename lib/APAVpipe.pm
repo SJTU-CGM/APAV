@@ -57,7 +57,7 @@ Options for PAV Determination:
 
 Options for the tracks in genome browser in PAV report:
   --fa                  <file>          Fasta file of reference genome.
-  --cpbam				Copy bam files instead of make symbolic links.
+  --slice				Extract the bam file of the target regions, otherwise make symbolic links for the raw bam file.
 
 
 Options for the phenotype association analysis: 
@@ -70,7 +70,7 @@ Other Options:
   --fam			<file>		Gene family table.
   --focused_pheno	<string>	The phenotype in focus.
   --example_n		<int>		The number of examples used to show figures drawn by 'pavPlotPhenoVio/pavPlotPhenoBar' commands and 'elePlotCov/elePlotPAV/elePlotDepth' commands.
-  					(Default:10)
+  					(Default:5)
 
   -h, --help                            Print usage page.
 
@@ -80,10 +80,10 @@ Other Options:
 	my ($gff, $bamdir, $out, $pheno);
 	my ($chrl, $up_n, $up_bin, $down_n, $down_bin);
 	my ($rep, $mincov, $mergecov, $rmele, $thread);
-	my ($fa, $gff, $cpbam, $fam);
+	my ($fa, $gff, $slice, $fam);
 	my ($method, $thre, $mina, $iter);
 	my ($focus, $p_thre, $adjustp);
-	my $topn = 10;
+	my $topn = 5;
 	my $help;
 
 	GetOptions(
@@ -105,7 +105,7 @@ Other Options:
 
 		'fa=s'		=> \$fa,
 		'gff=s'		=> \$gff,
-		'cpbam!'	=> \$cpbam,
+		'slice!'	=> \$slice,
 		'fam=s'		=> \$fam,
 		
 		'method=s'	=> \$method,
@@ -162,12 +162,12 @@ Other Options:
 
 	print STDOUT "\n";
 
-        calling($0, '.cov', '', $bamdir, $pheno, $out, $fa, $gff, $method, $thre, $mina, $iter, $cpbam);
+        calling($0, '.cov', '', $bamdir, $pheno, $out, $fa, $gff, $method, $thre, $mina, $iter, $slice);
 
 	print STDOUT "\n";
 
 	if(!$rmele && $rep ne "len" && $rep ne "highcov" && $rep ne "none"){
-		calling($0, '_ele.cov', '_ele', undef, $pheno, $out, undef, undef, $method, $thre, $mina, $iter, $cpbam);
+		calling($0, '_ele.cov', '_ele', undef, $pheno, $out, undef, undef, $method, $thre, $mina, $iter, $slice);
 		print STDOUT "\n";
 	}
 
@@ -224,7 +224,7 @@ Options for PAV Determination:
 
 Options for the tracks in genome browser:
   --fa                  <file>          Fasta file of reference genome.
-  --cpbam                               Copy bam files instead of make symbolic links.
+  --slice                               Extract the bam file of the target regions, otherwise make symbolic links for the raw bam file.
 
 
 Options for the phenotype association analysis:
@@ -243,7 +243,7 @@ Other Options:
 
 	my ($bed, $bamdir, $out, $pheno);
 	my ($rep, $mincov, $mergecov, $rmele, $thread);
-        my ($fa, $gff, $cpbam);
+        my ($fa, $gff, $slice);
         my ($method, $thre, $mina, $iter);
         my ($focus, $p_thre, $adjustp);
         my $topn = 10;
@@ -261,7 +261,7 @@ Other Options:
 
                 'fa=s'          => \$fa,
                 'gff=s'         => \$gff,
-		'cpbam!'	=> \$cpbam,
+		'slice!'	=> \$slice,
 
                 'method=s'      => \$method,
                 'thre=f'        => \$thre,
@@ -303,12 +303,12 @@ ly request that the output directory should not exist.\n" if -e $out;
 
 	print STDOUT "\n";
 
-        calling($0, '.cov', '', $bamdir, $pheno, $out, $fa, $gff, $method, $thre, $mina, $iter, $cpbam);
+        calling($0, '.cov', '', $bamdir, $pheno, $out, $fa, $gff, $method, $thre, $mina, $iter, $slice);
 
 	print STDOUT "\n";
 
 	if(!$rmele){
-		calling($0, '_ele.cov', '_ele', undef, $pheno, $out, undef, undef, $method, $thre, $mina, $iter, $cpbam);
+		calling($0, '_ele.cov', '_ele', undef, $pheno, $out, undef, undef, $method, $thre, $mina, $iter, $slice);
 		print STDOUT "\n"; 
 	}
 
@@ -365,7 +365,7 @@ sub ele_visual{
 
 sub calling{
 
-	my ($c, $cov_suffix, $pav_suffix, $bam_dir, $pheno, $out, $fa, $gff, $method, $thre, $mina, $iter, $cpbam) = @_;
+	my ($c, $cov_suffix, $pav_suffix, $bam_dir, $pheno, $out, $fa, $gff, $method, $thre, $mina, $iter, $slice) = @_;
 
 	my @arg_callpav = ("$c callPAV --cov $out/${out}${cov_suffix} --out $out/$out${pav_suffix}");
         push @arg_callpav, "--pheno $pheno" if defined($pheno);
@@ -376,7 +376,7 @@ sub calling{
         push @arg_callpav, "--thre $thre" if defined($thre);
         push @arg_callpav, "--mina $mina" if defined($mina);
         push @arg_callpav, "--iter $iter" if defined($iter);
-	push @arg_callpav, "--cpbam" if defined($cpbam);
+	push @arg_callpav, "--slice" if defined($slice);
         system(join(" ", @arg_callpav));
 }
 

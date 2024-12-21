@@ -6,7 +6,7 @@ package APAVreport;
 
 sub getPavReport{
 
-	my ($fa_flag, $gff_flag, $th_samples, $sample_data, $dtable, $bam_tracks) = @_;
+	my ($fa_flag, $gff_flag, $th_samples, $sample_data, $bam_tracks) = @_;
 
 	my $gff_track = '';
 	my $gff_session = '';
@@ -155,9 +155,11 @@ body {
 <script>
 
                 $(document).ready(function(){
+			
+		    $.getJSON("./data.json").done(function(data) {
 
                         let samples = '.$sample_data.';
-                        let dtable = '.$dtable.';
+                        let dtable = data.pav;
 
                         let covChart = echarts.init(document.getElementById("cov-plot"));
                         let groupChart = echarts.init(document.getElementById("group-plot"));
@@ -174,6 +176,7 @@ body {
                         pavTable.row(":eq(0)").select();
 
 			'.$genome.'	
+		    })
                 })
 
 </script>
@@ -184,7 +187,7 @@ body {
 }
 
 sub getSampleReport {
-	my ($br_phen, $th_region, $div_phen, $idata, $sdata, $phens, $phen_init, $phen_draw) = @_;
+	my ($br_phen, $th_region, $div_phen, $phens, $phen_init, $phen_draw) = @_;
 
 	my $report = '<!doctype html>
 <html>
@@ -305,9 +308,11 @@ body {
 
         $(document).ready(function(){
 
-                let idata = '.$idata.';
+	   $.getJSON("./data.json").done(function(data) {
 
-                let sdata = '.$sdata.';
+                let idata = data.gene;
+
+                let sdata = data.sample;
                 let phens = '.$phens.';
 
                 let itemTable = $("#item-table").DataTable(itemTableOption(idata));
@@ -324,6 +329,7 @@ body {
                 })
 
                 sampleTable.draw();
+ 	   })
 
         })
 
