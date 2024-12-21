@@ -158,13 +158,15 @@ apav gFamPAV --pav demo1_all.pav --fam demo1_gene.fam
 Based on the PAV table, you can use the `pavSize` command to estimate genome size by simulating the size of the pan-genome and core-genome.
 ```
 apav pavSize --pav demo1_all.pav
+```
+```
 ## Estimation in groups
 cat demo_sample.pheno | cut -f 1,2 > demo_sample.group
 apav pavSize --pav demo1_all.pav --group demo_sample.group
 ```
 The `pavPlotSize` command can draw the growth curve of genome estimate.
 ```
-apav pavPlotSize --sizeout demo1_all.sizeout
+apav pavPlotSize --size demo1_all.size
 ```
 
 #### 6. Common PAV analysis and visulization
