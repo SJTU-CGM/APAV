@@ -12,7 +12,7 @@ sub phenosta {
 	my $usage = "\nUsage: apav pavStaPheno --pav <pav_file> --pheno <phenotype_file> [options]
 
 Necessary input description:
-  -i, --pav         	<file>        	PAV file produced by command 'apav callpav'.
+  -i, --pav         	<file>        	PAV file produced by command 'apav callPAV'.
   --pheno       	<file>        	Phenotype file.
         
 Options:
@@ -65,7 +65,7 @@ sub phenoPlotHeat{
 	my $usage = "\nUsage: apav pavPlotPhenoHeat --pav <pav_file> --pheno_res <phenotype_association_result> [options]
 
 Necessary input description:
-  --pav         		<file>		PAV file produced by command 'apav callpav'.
+  --pav         		<file>		PAV file produced by command 'apav callPAV'.
   --pheno_res   		<file>        	Phenotype association result produced by command 'apav pavStaPheno'.
         
 Options:
@@ -287,7 +287,7 @@ sub phenoPlotBlock{
 	my $usage = "\nUsage: apav pavPlotPhenoBlock --pav <pav_file> --pheno <phenotype file> --pheno_res <phenotype_association_result> --phen_name <phenotype name> [options]
 
 Necessary input description:
-  -i, --pav         		<string>        PAV file produced by command 'apav callpav'.
+  -i, --pav         		<string>        PAV file produced by command 'apav callPAV'.
   --pheno           		<file>          Phenotype file.
   --pheno_res   		<file>	        Phenotype association result produced by command 'apav pavStaPheno'.
   --pheno_name                  <string>	Phenotype name.	
@@ -516,7 +516,7 @@ sub phenPlotManhattan{
 	my $usage = "\nUsage: apav pavPlotPhenoMan --pav <pav_file> --pheno_res <phenotype_association_result> --pheno_name <phenotype> [options]
 	
 Necessary input description:
-  -i, --pav         	<file>        	PAV file produced by command 'apav callpav'.
+  -i, --pav         	<file>        	PAV file produced by command 'apav callPAV'.
   --pheno               <file>          Phenotype file.
   
   --pheno_res   	<file>        	Phenotype association result produced by command 'apav pavStaPheno'.
@@ -608,7 +608,7 @@ sub phenoPlotBar {
 	my $usage = "\nUsage: apav pavPlotPhenoBar --pav <pav_file> --pheno <phenotype_file> --region_name <region> --pheno_name <phenotype> [options]
 
 Necessary input description:
-  -i, --pav         	<file>        	PAV file produced by command 'apav callpav'.
+  -i, --pav         	<file>        	PAV file produced by command 'apav callPAV'.
   --pheno		<file>		Phenotype file.
 
   --pheno_name 		<string>	The name of phenotype.
@@ -705,7 +705,7 @@ sub phenoPlotViolin {
 	my $usage = "\nUsage: apav pavPlotPhenoVio --pav <pav_file> --pheno <phenotype_file> --region_name <region> --pheno_name <phenotype> [options]
 
 Necessary input description:
-  -i, --pav             <file>          PAV file produced by command 'apav callpav'.
+  -i, --pav             <file>          PAV file produced by command 'apav callPAV'.
   --pheno               <file>          Phenotype file.
 
   --pheno_name          <string>        The name of phenotype.

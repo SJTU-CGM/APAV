@@ -13,7 +13,7 @@ sub pavPCA {
 	my $usage = "\nUsage: apav pavPCA --pav <pav_file> [options]
 	
 Necessary input description:
-  -i, --pav         	<file>		PAV file produced by command 'apav callpav'.
+  -i, --pav         	<file>		PAV file produced by command 'apav callPAV'.
         
 Options:
   --pheno       	<file>	        Phenotype file.
@@ -90,7 +90,7 @@ sub pavCluster {
 	my $usage = "\nUsage: apav pavCluster --pav <pav_file> [options]
 	
 Necessary input description:
-  -i, --pav         	<file>  	PAV file produced by command 'apav callpav'.
+  -i, --pav         	<file>  	PAV file produced by command 'apav callPAV'.
         
 Options:
   --pheno		<file>	        Phenotype file.
@@ -181,7 +181,7 @@ sub pavPlotBar {
 	my $usage = "\nUsage apav pavPlotBar --pav <pav_file> [options]
 	
 Necessary input description:
-  -i, --pav    	    	<file>		PAV file produced by command 'apav callpav'.   
+  -i, --pav    	    	<file>		PAV file produced by command 'apav callPAV'.   
         
 Options:
   --pheno       	<file>		Phenotype file.
@@ -309,7 +309,7 @@ sub pavPlotStat {
 	my $usage = "\nUsage: apav pavPlotStat --pav <pav_file> [options]
 
 Necessary input description:
-  -i, --pav             <file>          PAV file produced by command 'apav callpav'.
+  -i, --pav             <file>          PAV file produced by command 'apav callPAV'.
 
 Options:
   --pheno		<file>		Phenotype file.
@@ -391,7 +391,7 @@ sub pavPlotHist {
 	my $usage = "\nUsage: apav pavPlotHist --pav <pav_file> [options]
 	
 Necessary input description:
-  -i, --pav         	<file>        	PAV file produced by command 'apav callpav'.
+  -i, --pav         	<file>        	PAV file produced by command 'apav callPAV'.
         
 Options:
   -o, --out             <string>        Figure name.
@@ -499,7 +499,7 @@ sub pavPlotHeat {
 	my $usage = "\n Usage: apav pavPlotHeat --pav <pav_file> [options]
 	
 Necessary input description:
-  -i, --pav			<file>		PAV file produced by command 'apav callpav'.
+  -i, --pav			<file>		PAV file produced by command 'apav callPAV'.
 	
 Options:
   --pheno			<file>		Phenotype file.
