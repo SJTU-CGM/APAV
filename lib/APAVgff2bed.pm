@@ -98,6 +98,20 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 	my @cur_less_info;
 	my @cur_large_info;
 	
+	our %warn_count;
+	our $max_warn = 3;
+
+	sub warn_limit {
+		my ($key, $message) = @_;
+		$warn_count{$key}++;
+		if ($warn_count{$key} <= $max_warn) {
+			warn "WARNING: $message\n";
+			if ($warn_count{$key} == $max_warn) {
+			       	warn "WARNING: (Suppressing further '$key' messages)\n";
+			}
+		}
+	}
+
 	while(<GFF>){
 		$_ =~ s/\r\n$//;
 		if($_ =~ /^[^#\s]+/){
@@ -110,11 +124,14 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 			my $lcds;
 			if($type eq "gene"){
 				if($info[8] =~ /ID=([^;]+)(;|$)/){
-					die "Gene id should not contian ':'\n" if($1 =~ /\:/);
+					my ($gene_id_original, $gene_id_safe) = ($1, $1);
+					if ($gene_id_safe =~ s/:/_/g) {
+						warn_limit("gene_id_colon", "Line $. - Gene ID '$gene_id_original' contains ':', converted to '$gene_id_safe'");
+					}
 					printRes(\%cur_exon_info, \%cur_lcds_info, $chr, \@cur_less_info, \@cur_large_info, $cur_gene_id) if(defined($cur_gene_id));
-					print OUT "$info[0]\t".($start - 1)."\t".$end."\t".$1."\n";
+					print OUT "$info[0]\t".($start - 1)."\t".$end."\t".$gene_id_safe."\n";
 					$chr = $info[0];
-					$cur_gene_id = $1;
+					$cur_gene_id = $gene_id_safe;
 					%cur_tran_map = ();
 					$cur_tran_count = 1;
 					%cur_exon_info = ();
@@ -131,20 +148,27 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 						@cur_large_info = ();
 					}
 				}else{
-					die "Can not find gene id";
+					warn_limit("gene_no_id", "Line $. - Cannot find gene ID (type: $type), skipping this feature");
+					next;
 				}	
-			}elsif($type eq "mRNA" | $type eq "transcript"){
+			}elsif($type =~ /(?:RNA|transcript)$/){
 				if($info[8] =~ /ID=([^;]+)(;|$)/){
-					$cur_tran_map{$1} = "T".$cur_tran_count;
+					my ($transcript_id_original, $transcript_id_safe) = ($1, $1);
+					if ($transcript_id_safe =~ s/:/_/g) {
+						warn_limit("transcript_id_colon","Line $. - Transcript ID '$transcript_id_original' contains ':', converted to '$transcript_id_safe'");
+					}
+					$cur_tran_map{$transcript_id_safe} = "T".$cur_tran_count;
 					$cur_tran_count ++;
 					$cur_exon_count = 1;
 				}else{
-					die "Can not find $type id";
+					warn_limit("transcript_no_id", "Line $. - Cannot find $type ID, skipping this feature");
 				}
 			}elsif($type eq "exon"){
 				if($info[8] =~ /Parent=([^;]+)(;|$)/){
-					if(exists($cur_tran_map{$1})){
-						my $cur_tran_id = $cur_tran_map{$1};
+					my ($parent_id_original, $parent_id_safe) = ($1, $1);
+					$parent_id_safe =~ s/:/_/g;
+					if(exists($cur_tran_map{$parent_id_safe})){
+						my $cur_tran_id = $cur_tran_map{$parent_id_safe};
 						my $cur_exon_id = $cur_tran_id.":exon".$cur_exon_count;
 						$cur_exon_count ++;
 						if(exists($cur_exon_info{"$start-$end"})){
@@ -152,21 +176,27 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 						}else{
 							$cur_exon_info{"$start-$end"} = [$cur_exon_id];
 						}
+					}else{
+						warn_limit("exon_no_parent", "Line $. - Cannot find parent transcript for exon, skipping");
+						next;
 					}
 				}else{
-					die "Can not find exon's parent id";
+					warn_limit("exon_no_parent_attr", "Line $. - Exon without Parent attribute, skipping");
+					next;
 				}			
-			}elsif($type eq "CDS" | $type eq "five_prime_UTR" | $type eq "three_prime_UTR" | $type eq "5UTR" | $type eq "3UTR"){
+			}elsif($type eq "CDS" || $type eq "five_prime_UTR" || $type eq "three_prime_UTR" || $type eq "5UTR" || $type eq "3UTR"){
 				if($type eq "CDS"){
 					$lcds = "CDS";
-				}elsif($type eq "five_prime_UTR" | $type eq "5UTR"){
+				}elsif($type eq "five_prime_UTR" || $type eq "5UTR"){
 					$lcds = "5UTR";
 				}else{
 					$lcds = "3UTR";
 				}	
 				if($info[8] =~ /Parent=([^;]+)(;|$)/){
-					if(exists($cur_tran_map{$1})){
-						my $cur_tran_id = $cur_tran_map{$1};
+					my ($parent_id_original, $parent_id_safe) = ($1, $1);
+					$parent_id_safe =~ s/:/_/g; 
+					if(exists($cur_tran_map{$parent_id_safe})){
+						my $cur_tran_id = $cur_tran_map{$parent_id_safe};
 						if(exists($cur_exon_info{"$start-$end"})){
 							for(my $i=0; $i<=$#{$cur_exon_info{"$start-$end"}}; $i++){
 								if(@{$cur_exon_info{"$start-$end"}}[$i] =~ /^$cur_tran_id:exon/){
@@ -193,10 +223,12 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 							}
 						}
 					}else{
-						die "Can not find parent";
+						warn_limit("cds_no_parent", "Line $. - Cannot find parent transcript for $type, skipping");
+						next;
 					}
 				}else{
-					die "Can not find cds/utr's parent id";
+					warn_limit("cds_no_parent_attr", "Line $. - $type without Parent attribute, skipping");
+					next;
 				}
 			}
 		}
@@ -207,6 +239,22 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 	close(GFF);
 	close(CHRL);
 	close(OUT);
+
+	if (scalar keys %warn_count > 0) {
+		warn "\nWarning Summary:\n";
+		my %desc = (
+        		'gene_id_colon' => 'Gene IDs containing colon (converted)',
+        		'transcript_id_colon' => 'Transcript IDs containing colon (converted)',
+        		'exon_no_parent' => 'Exons skipped (parent not found)',
+        		'exon_no_parent_attr' => 'Exons skipped (no Parent attribute)',
+        		'cds_no_parent' => 'CDS/UTR skipped (parent not found)',
+        		'cds_no_parent_attr' => 'CDS/UTR skipped (no Parent attribute)',
+    		);
+		for my $key (sort keys %warn_count) { 
+			my $d = $desc{$key} || $key;
+			warn "$d: $warn_count{$key}\n";
+		}
+	}
 
 	my $etime = `date +"%Y-%m-%d %H:%M:%S"`;
         chomp($etime);
@@ -242,6 +290,7 @@ sub printRes{
                 print OUT $chr."\t".($large[$i][0] - 1)."\t",$large[$i][1]."\t".$large[$i][2]."\n";   ## start
         }
 }
+
 
 sub getUpDown{
         my ($gene_id, $chr, $chr_len, $strand, $start, $end, $up_bin, $up_n, $down_bin, $down_n) = @_;
