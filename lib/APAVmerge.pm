@@ -207,7 +207,7 @@ sub mergeGene{
                 my $anno = $info[4];
                 my @covs = @info[(5)..($#info)];
 
-		die "It seems to have been merged\n" if($start =~ /,/ | $end =~ /,/);
+		die "It seems to have been merged\n" if($start =~ /,/ || $end =~ /,/);
 
 		if(!isAll01(\@covs)){
 			printStream(\@tmp_streams, \@tmp_streams_covs) if(@tmp_streams);

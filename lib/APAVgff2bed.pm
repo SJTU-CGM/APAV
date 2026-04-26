@@ -122,7 +122,7 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 			my $end = $info[4];
 			my $strand = $info[6];
 			my $lcds;
-			if($type eq "gene"){
+			if($type eq "gene" || $type eq "pseudogene"){
 				if($info[8] =~ /ID=([^;]+)(;|$)/){
 					my ($gene_id_original, $gene_id_safe) = ($1, $1);
 					if ($gene_id_safe =~ s/:/_/g) {
@@ -137,7 +137,7 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 					%cur_exon_info = ();
 					%cur_lcds_info = ();
 
-					if(($up_bin*$up_n  > 0) | ($down_bin*$down_n > 0)){
+					if(($up_bin*$up_n  > 0) || ($down_bin*$down_n > 0)){
 						die "Can not find length of $chr\n" if(!exists($chr_len{$chr}));
 						my ($cur_less_info, $cur_large_info) = getUpDown($cur_gene_id, $chr, $chr_len{$chr}, $strand, $start, $end, $up_bin, $up_n, $down_bin, $down_n);
 						@cur_less_info = @$cur_less_info;
@@ -151,13 +151,17 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 					warn_limit("gene_no_id", "Line $. - Cannot find gene ID (type: $type), skipping this feature");
 					next;
 				}	
-			}elsif($type =~ /(?:RNA|transcript)$/){
+			}elsif($type =~ /(?:RNA|transcript)$/ || $type =~ /_gene_segment$/){
 				if($info[8] =~ /ID=([^;]+)(;|$)/){
 					my ($transcript_id_original, $transcript_id_safe) = ($1, $1);
 					if ($transcript_id_safe =~ s/:/_/g) {
-						warn_limit("transcript_id_colon","Line $. - Transcript ID '$transcript_id_original' contains ':', converted to '$transcript_id_safe'");
+						my ($warn_key, $label) = ($type =~ /_gene_segment$/) 
+							? ("gene_segment_id_colon", "Gene Segment") 
+							: ("transcript_id_colon", "Transcript");
+						warn_limit($warn_key, "Line $. - $label ID '$transcript_id_original' contains ':', converted to '$transcript_id_safe'");
 					}
-					$cur_tran_map{$transcript_id_safe} = "T".$cur_tran_count;
+					my $prefix = ($type =~ /_gene_segment$/) ? "S" : "T";
+					$cur_tran_map{$transcript_id_safe} = $prefix.$cur_tran_count;
 					$cur_tran_count ++;
 					$cur_exon_count = 1;
 				}else{
@@ -237,14 +241,15 @@ Warning: '--chrl' is required when setting 'up_n'&'up_bin' or 'down_n'&'down_bin
 	printRes(\%cur_exon_info, \%cur_lcds_info, $chr, \@cur_less_info, \@cur_large_info, $cur_gene_id);
 
 	close(GFF);
-	close(CHRL);
+	close(CHRL) if $chrl;
 	close(OUT);
 
 	if (scalar keys %warn_count > 0) {
-		warn "\nWarning Summary:\n";
+		warn "Warning Summary:\n";
 		my %desc = (
         		'gene_id_colon' => 'Gene IDs containing colon (converted)',
         		'transcript_id_colon' => 'Transcript IDs containing colon (converted)',
+			'gene_segment_id_colon' => 'Gene segment IDs containing colon (converted)',
         		'exon_no_parent' => 'Exons skipped (parent not found)',
         		'exon_no_parent_attr' => 'Exons skipped (no Parent attribute)',
         		'cds_no_parent' => 'CDS/UTR skipped (parent not found)',
