@@ -67,8 +67,9 @@ Warning: '--rep XXX' only works with '--asgene' ;
 		'help|h!'	=> \$help	
 	) or die $!."\n";
 
-	die $usage if !defined($bed) & !defined($bam_dir);
+	die $usage if (!defined($bed) || !defined($bam_dir));
 	die $usage if $help;
+	die "Parameter '--rmele' cannot be used with '--asgene --rep all'.\n" if($asgene && $rep eq "all" && $rmele);
 	APAVutils::check_file('--bed/-i', $bed);
 	APAVutils::check_file('--bamdir/-b', $bam_dir);
 	$out = APAVutils::check_out($out, $bed, "");
@@ -83,6 +84,7 @@ Warning: '--rep XXX' only works with '--asgene' ;
 	$header .= " --merge" if $merge;
 
 	$bam_dir.="/" unless($bam_dir=~/\/$/);
+	APAVutils::check_bamdir('--bamdir', $bam_dir);
 	my @bams = <$bam_dir*.bam>;
 	my @samples = @bams;
 	map{ $_ =~ s/.*\///g }@samples;
@@ -101,12 +103,13 @@ Warning: '--rep XXX' only works with '--asgene' ;
 		$tmpdir = $tmpdir_init.time().$counter;
 		$counter ++;
 	}
-	system("mkdir $tmpdir");
+	mkdir($tmpdir) or die "Could not create directory '$tmpdir'.\n";
+	my $depth_bed = "$tmpdir/depth_regions.bed";
+	write_depth_bed($region, $depth_bed);
 	foreach my $i(0..$#bams){
-		print "-- $bams[$i]\n";
-		system("samtools depth -@ $thread -aa -b $bed $bams[$i] > $tmpdir/$samples[$i].depth");
-		depth2cov($region, $samples[$i], $out, $tmpdir, $asgene, $rep, $mincov, $header, $rmele);
-		system("rm $tmpdir/$samples[$i].depth");
+		my $t0 = time();
+		depth2cov($region, $samples[$i], $out, $tmpdir, $asgene, $rep, $mincov, $header, $rmele, $depth_bed, $bams[$i], $thread);
+		printf "-- %s (%d s)\n", $bams[$i], time() - $t0;
 	}
 
 	paste_cov($asgene, $rep, \@samples, $out, $tmpdir, $header, $rmele);
@@ -124,15 +127,76 @@ Warning: '--rep XXX' only works with '--asgene' ;
         print STDOUT "[".$etime."] [staCov] Finished\n";
 }
 
+
+sub get_depth_chromosomes {
+	my ($bam, $region) = @_;
+
+	open(my $fh, "-|", "samtools", "view", "-H", $bam) or die "Could not read BAM header for '$bam'.\n";
+
+	my (%chr_len, @bam_chrs);
+
+	while(<$fh>){
+		next unless /^\@SQ\t/;
+
+		my ($chr) = /\tSN:([^\t\r\n]+)/;
+		my ($len) = /\tLN:(\d+)/;
+
+		die "Invalid BAM header in '$bam'.\n" if(!defined($chr) || !defined($len));
+		die "Duplicate reference '$chr' in BAM '$bam'.\n" if(exists($chr_len{$chr}));
+
+		$chr_len{$chr} = $len;
+		push(@bam_chrs, $chr);
+	}
+
+	close($fh) or die "Failed to read BAM header for '$bam'.\n";
+
+	my ($total_len, $target_len) = (0, 0);
+	$total_len += $_ foreach values %chr_len;
+	die "No reference sequences in BAM '$bam'.\n" if(!$total_len);
+
+	foreach my $chr (keys %{$region}){
+		die "Reference '$chr' not found in BAM '$bam'.\n" if(!exists($chr_len{$chr}));
+
+		foreach my $r (@{$region->{$chr}}){
+			die "Invalid region $chr:$r->[0]-$r->[1].\n" if($r->[0] < 1 || $r->[1] > $chr_len{$chr});
+		}
+
+		$target_len += $chr_len{$chr};
+	}
+
+	return [] if($target_len * 2 >= $total_len);
+
+	(my $prefix = $bam) =~ s/\.bam$//i;
+	my @indexes = ("$bam.bai", "$bam.csi");
+
+	if($prefix ne $bam){
+		push(@indexes, "$prefix.bai", "$prefix.csi");
+	}
+
+	return [] unless(grep {-f $_} @indexes);
+
+	my @target_chrs = grep { exists($region->{$_}) } @bam_chrs;
+
+	return \@target_chrs;
+}
+
+
 sub depth2cov {
 
-	my ($region, $sample, $out, $tmpdir, $asgene, $rep, $mincov, $header, $rmele) = @_;
+	my ($region, $sample, $out, $tmpdir, $asgene, $rep, $mincov, $header, $rmele, $depth_bed, $bam, $thread) = @_;
 	my %region = %$region;
 
-		open(DEPTH, "<$tmpdir/$sample.depth");
-		open(OUT1, ">$tmpdir/$sample.cov");
+		my $chrs = get_depth_chromosomes($bam, $region);
+		my @cmd = @$chrs 
+		? ("bash", "-e", "-c", 
+			'for chr in "${@:4}"; do samtools depth -@ "$3" -aa -r "$chr" -b "$2" "$1"; done', 
+			"apav", $bam, $depth_bed, $thread, @$chrs)
+		: ("samtools", "depth", "-@", $thread, "-aa", "-b", $depth_bed, $bam);
+
+		open(DEPTH, "-|", @cmd) or die "Could not run samtools depth for '$bam'.\n";
+		open(OUT1, ">$tmpdir/$sample.cov") or die "Could not open file '$tmpdir/$sample.cov'.\n";
 		if(!$rmele){
-			open(OUT2, ">$tmpdir/${sample}_ele.cov");
+			open(OUT2, ">$tmpdir/${sample}_ele.cov") or die "Could not open file '$tmpdir/${sample}_ele.cov'.\n";
 		}
 	
 		my @chr_region;
@@ -197,7 +261,7 @@ sub depth2cov {
 				shift(@chr_region);
 			}
 
-			@tmp = sort {$a->[1] <=> $b->[1]} @tmp;
+			@tmp = sort {$a->[1] <=> $b->[1]} @tmp if(@n);
 
 			my @m;
 			foreach(@tmp){
@@ -251,9 +315,11 @@ sub depth2cov {
 		%chr_res = ();
 
 
-		close(DEPTH);
-		close(OUT1);
-		close(OUT2);
+		close(DEPTH) or die "Failed to calculate depth for '$bam'.\n";
+		close(OUT1) or die "Could not close file '$tmpdir/$sample.cov'.\n";
+		if(!$rmele){
+			close(OUT2) or die "Could not close file '$tmpdir/${sample}_ele.cov'.\n";
+		}
 }
 
 
@@ -271,7 +337,7 @@ sub paste_cov{
 		system("sed -i '1i\\".$header."' ${out}.cov");
 	}
 	if($asgene && ($rep eq "highcov")){
-		system("cut -f 1,2,3,4,5 $tmpdir/$samples[0].cov > ${out}.cov.pos");
+		system("cut -f 1,2,3,4,5,7 $tmpdir/$samples[0].cov > ${out}.cov.pos");
 		foreach(1..$#samples){
 			system("cut -f 7 $tmpdir/$samples[$_].cov | paste ${out}.cov.pos - > ${out}.cov.pos.tmp ");
 			system("mv ${out}.cov.pos.tmp ${out}.cov.pos");
@@ -312,7 +378,7 @@ sub print_chr_res {
 					if($rep eq "none" || $rep eq "len"){
 						print_gene_cov($chr, $rep, $_, $rmele);
 					}else{
-						if( $anno =~ /^[^:]*:\[[UP|DOWN].*\]$/){
+						if($anno =~ /^[^:]*:\[(?:UP|DOWN):.*\]$/){
 							if($flag){
 								print_gene_cov($chr, $rep, \%trans, $rmele);
 								$flag = 0;
@@ -479,7 +545,7 @@ sub get_region {
 					}
 					$cur_chr = $chr;
 				}
-				if($anno =~ /.*:\[UP.*\]$/){
+				if($anno =~ /^[^:]*:\[UP:.*\]$/){
 					$flag = "up" if !defined($flag);
 					if($flag ne "up"){
 						if(%cur_trans){
@@ -489,7 +555,7 @@ sub get_region {
 					}
 					push(@{$region{$chr}}, [$start, $end, $anno]);
 					$flag = "up";
-				}elsif($anno =~ /.*:\[DOWN.*\]$/){
+				}elsif($anno =~ /^[^:]*:\[DOWN:.*\]$/){
 					$flag = "down" if !defined($flag);
 					if($flag ne "down"){
 						if(%cur_trans){
@@ -622,6 +688,48 @@ sub get_longest{
 	}
 	return(\@res);
 } 
+
+
+
+sub write_depth_bed {
+	my ($region, $bedfile) = @_;
+
+	open(my $fh, ">", $bedfile) or die "Could not open file $bedfile: $!";
+
+	foreach my $chr (sort keys %{$region}) {
+
+		my @intervals = sort {
+			$a->[0] <=> $b->[0] || $a->[1] <=> $b->[1]
+		} @{$region->{$chr}};
+
+		my ($cur_start, $cur_end);
+
+		foreach my $r (@intervals) {
+
+			my $start = $r->[0] - 1;
+			my $end   = $r->[1];
+
+			die "Invalid interval: $chr:$start-$end\n" if $start < 0 || $end <= $start;
+
+			if (!defined $cur_start) {
+				($cur_start, $cur_end) = ($start, $end);
+			} elsif ($start <= $cur_end) {
+				$cur_end = $end if $end > $cur_end;
+			} else {
+				print $fh "$chr\t$cur_start\t$cur_end\n";
+				($cur_start, $cur_end) = ($start, $end);
+			}
+		}
+
+		if (defined $cur_start) {
+			print $fh "$chr\t$cur_start\t$cur_end\n";
+		}
+	}
+
+	close($fh) or die "Cannot close $bedfile: $!";
+}
+
+
 
 sub covround {
         my ($d) = @_;

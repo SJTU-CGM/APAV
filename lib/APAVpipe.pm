@@ -123,9 +123,10 @@ Other Options:
 
 	) or die $!."\n";
 
-	die $usage if !defined($gff) & !defined($bamdir) & !defined($out) & !defined($pheno);
+	die $usage if(!defined($gff) || !defined($bamdir) || !defined($out) || !defined($pheno));
         die $usage if $help;
 
+	die "Parameter '--rep all' is not supported by geneBatch.\n" if(defined($rep) && $rep eq "all");
 	APAVutils::check_file('--gff/-i', $gff);
 	APAVutils::check_file('--pheno', $pheno);
         APAVutils::check_bamdir('--bamdir/-b', $bamdir);
@@ -137,7 +138,7 @@ Other Options:
 
 	die "Error: output directory \"$out\" already exists. To avoid overwriting of existing files, we kindly request that the output directory should not exist.\n" if -e $out;
 
-	system("mkdir $out");
+	mkdir($out) or die "Could not create directory '$out'.\n";
 
 	print STDOUT "\n";
 
@@ -147,7 +148,7 @@ Other Options:
 	push @arg_gff, "--up_bin $up_bin" if defined($up_bin);
 	push @arg_gff, "--down_n $down_n" if defined($down_n);
 	push @arg_gff, "--down_bin $down_bin" if defined($down_bin);
-	system(join(" ", @arg_gff));
+	die "Failed to run gff2bed.\n" if(system(join(" ", @arg_gff)) !=0);
 
 	print STDOUT "\n";
 
@@ -158,7 +159,7 @@ Other Options:
 	push @arg_cov, "--rmele" if defined($rmele);
 	push @arg_cov, "--merge" if defined($mergecov);
 	push @arg_cov, "--thread $thread" if defined($thread);	
-        system(join(" ", @arg_cov));
+        die "Failed to run staCov.\n" if(system(join(" ", @arg_cov)) != 0);
 
 	print STDOUT "\n";
 
@@ -278,7 +279,7 @@ Other Options:
 
         ) or die $!."\n";
 
-        die $usage if !defined($bed) & !defined($bamdir) & !defined($out) & !defined($pheno);
+	die $usage if(!defined($bed) || !defined($bamdir) || !defined($out) || !defined($pheno));
         die $usage if $help;
 
         APAVutils::check_file('--bed/-i', $bed);
@@ -290,7 +291,7 @@ Other Options:
 	die "Error: output directory \"$out\" already exists. To avoid overwriting of existing files, we kind
 ly request that the output directory should not exist.\n" if -e $out;
 
-        system("mkdir $out");
+        mkdir($out) or die "Could not create directory '$out'.\n";
 
 	print STDOUT "\n";
 
@@ -299,7 +300,7 @@ ly request that the output directory should not exist.\n" if -e $out;
 	push @arg_cov, "--rmele" if defined($rmele);
 	push @arg_cov, "--merge" if defined($mergecov);
 	push @arg_cov, "--thread $thread" if defined($thread);
-        system(join(" ", @arg_cov));
+        die "Failed to run staCov.\n" if(system(join(" ", @arg_cov)) != 0);
 
 	print STDOUT "\n";
 
@@ -329,7 +330,7 @@ sub ele_visual{
 
 	printLog("[elePlotCov/elePlotPAV/elePlotDepth] Give some examples for showing the coordinate positions and coverage/PAV/depth of elements...");
 
-	system("mkdir $out/$eledir");
+	mkdir("$out/$eledir") or die "Could not create directory '$out/$eledir'.\n";
 	my @ele_list = `grep -v -E "#|Annotation" ${out}/${out}_ele_dispensable.pav |  cut -f 5 | sed 's/:\\[.*\\]//g' | uniq | head -n $topn`;
 	
 	my $elecov = "${out}/${out}_ele.cov";
@@ -377,7 +378,7 @@ sub calling{
         push @arg_callpav, "--mina $mina" if defined($mina);
         push @arg_callpav, "--iter $iter" if defined($iter);
 	push @arg_callpav, "--slice" if defined($slice);
-        system(join(" ", @arg_callpav));
+        die "Failed to run callPAV.\n" if(system(join(" ", @arg_callpav)) != 0);
 }
 
 
@@ -385,7 +386,7 @@ sub sim_analysis {
 
 	my ($c, $out) = @_;
 
-	system("mkdir ${out}/estimation");
+	mkdir("${out}/estimation") or die "Could not create directory '${out}/estimation'.\n";
 
         system("$c pavSize --pav ${out}/${out}_all.pav --out ${out}/estimation/${out}_all.size");
 
@@ -399,7 +400,7 @@ sub sim_analysis {
 
 sub cov_analysis {
 	my ($c, $pheno, $out) = @_;
-	system("mkdir ${out}/coverage_visualization");
+	mkdir("${out}/coverage_visualization") or die "Could not create directory '${out}/coverage_visualization'.\n";
 	printLog("[covPlotHeat] Plot the heatmap of coverage profile...");
         system("$c covPlotHeat --cov ${out}/$out.cov --pheno $pheno --cluster_rows --cluster_columns --out ${out}/coverage_visualization/${out}_cov_heatmap ");
 }
@@ -410,7 +411,7 @@ sub common_analysis{
 
 	my ($c, $pheno, $out, $focus) = @_;
 
-	system("mkdir ${out}/common_analysis");
+	mkdir("${out}/common_analysis") or die "Could not create directory '${out}/common_analysis'.\n";
 
         printLog("[pavPlotHist] Plot a histogram to show the classifications and distribution of target regions...");
         system("$c pavPlotHist --pav ${out}/${out}_all.pav --out ${out}/common_analysis/${out}_all_pav_hist");
@@ -448,7 +449,7 @@ sub pheno_analysis {
 
 	my ($c, $pheno, $pav, $out, $dir, $p_thre, $adjustp, $topn) = @_;
 
-	system("mkdir ${out}/$dir");
+	mkdir("${out}/$dir") or die "Could not create directory '${out}/$dir'.\n";
 
         printLog("[pavStaPheno] Determine phenotype association...");
         system("$c pavStaPheno --pav ${out}/$pav --pheno $pheno --out ${out}/$dir/${out}_dispensable.phenores");
@@ -484,7 +485,7 @@ sub pheno_analysis {
         my @phen_res = `head -n $topn ${out}/$dir/${out}_dispensable.phenores`;
         shift @phen_res;
         printLog("[pavPlotPhenoVio/pavPlotPhenoBar] Give some examples for showing the relationship between a genomic region and a certain phenotype in a barplot or violin plot");
-        system("mkdir ${out}/$dir/example");
+        mkdir("${out}/$dir/example") or die "Could not create directory '${out}/$dir/example'.\n";
         foreach (@phen_res){
                 $_ =~ s/\r\n$//;
                 chomp($_);

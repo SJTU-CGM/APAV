@@ -62,7 +62,7 @@ Options for the tracks in genome browser:
                 'out|o=s'       => \$out_prefix,
                 'method=s'	=> \$method,
 		'thre=f'	=> \$thre,
-		'mina=i'	=> \$min_absence,
+		'mina=f'	=> \$min_absence,
 		'iter=i'	=> \$max_iter,
 		'pheno=s'	=> \$phen_file,
 		'fa=s'		=> \$fa_file,
@@ -78,6 +78,8 @@ Options for the tracks in genome browser:
 	APAVutils::check_file('--pheno/-p', $phen_file);
 	$out_prefix = APAVutils::check_out($out_prefix, $cov, "");
 	die "Parameter '--method/-m' should be 'fixed' or 'adaptive'\n" if ($method ne "fixed" && $method ne "adaptive");
+	APAVutils::check_range('--mina', $min_absence, 0, 1);
+	APAVutils::check_positive('--iter', $max_iter);
 	APAVutils::check_file('--fa', $fa_file) if defined($fa_file);
 	APAVutils::check_file('--gff', $gff_file) if defined($gff_file);
 	APAVutils::check_file('--bamdir', $bam_dir) if defined($bam_dir);
@@ -156,15 +158,15 @@ Options for the tracks in genome browser:
 	if($phen_file){
 		open(PHEN, "<$phen_file") or die "Could not open file '$phen_file'\n";
 		while(<PHEN>){
-			$_ =~ s/\r\n$//;
+			$_ =~ s/\r?\n\z//;
 			chomp $_;
 			if(!@phen_name){
-				@phen_name = split(/\t/, $_);
+				@phen_name = split(/\t/, $_, -1);
 				shift @phen_name;
 				push(@phen_flag, 1) foreach @phen_name;
 				next;
 			}
-			my @arr = split(/\t/, $_);
+			my @arr = split(/\t/, $_, -1);
 			foreach (1..$#arr){
 				$phen_flag[$_-1] = 0 if(!isNum($arr[$_]));
 			}
@@ -179,6 +181,7 @@ Options for the tracks in genome browser:
 		my @stable;
 	
 		foreach my $i (0..$#samples){
+			die "Sample '$samples[$i]' not found in phenotype file '$phen_file'.\n" if(!exists($p{$samples[$i]}));
 			my @curphen = @{$p{$samples[$i]}};
 			my @curpav = map{my @n = split("/", $_->[$i+6]); $n[0]} @dtable;
 			push(@stable, [@curphen, @curpav]);
@@ -227,8 +230,8 @@ sub printGeneReport {
 		my @starts = split(/,/, $dtable[$i][2]);
 		my @ends = split(/,/, $dtable[$i][3]);
 		my $n = 1;
-		if($#starts eq 0){
-			print GBED $dtable[$i][1]."\t".($starts[$_]-1)."\t".$ends[$_]."\t".$dtable[$i][0]."\n";
+		if(@starts == 1){
+			print GBED $dtable[$i][1]."\t".($starts[0]-1)."\t".$ends[0]."\t".$dtable[$i][0]."\n";
 		}else{
 			foreach (0..$#starts){
 				print GBED $dtable[$i][1]."\t".($starts[$_]-1)."\t".$ends[$_]."\t".$dtable[$i][0]."[".$n."]"."\n";
@@ -397,8 +400,8 @@ sub topav {
                         }
                 }
                 @res = map{(abs($_ - $init_cen1) <= abs($_ - $init_cen2)) ? 0 : 1}@$arr;
-                $new_cen1 = sum(@$arr[@idx1]) / scalar(@idx1);
-                $new_cen2 = sum(@$arr[@idx2]) / scalar(@idx2);
+                $new_cen1 = median(@$arr[@idx1]);
+                $new_cen2 = median(@$arr[@idx2]);
                 if(($new_cen1 == $init_cen1) && ($new_cen2 == $init_cen2)){
                         last;
                 }else{
@@ -413,6 +416,16 @@ sub topav {
 }
 
 
+sub median {
+    my @s = sort { $a <=> $b } @_;
+    my $n = scalar @s;
+
+    return undef if $n == 0;
+
+    return $n % 2
+        ? $s[int($n / 2)]
+        : ($s[$n / 2 - 1] + $s[$n / 2]) / 2;
+}
 
 
 1;

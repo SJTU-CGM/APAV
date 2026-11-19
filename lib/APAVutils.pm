@@ -50,4 +50,19 @@ sub check_bamdir {
         die "Can not find bam files in the given directory\n" if $#bams == -1;
 }
 
+sub check_range {
+	my ($param, $value, $min, $max) = @_;
+	check_arg($param, $value);
+	die "Parameter '$param' should be between $min and $max.\n"
+	if($value < $min || $value > $max);
+}
+
+sub check_positive {
+	my ($param, $value) = @_;
+	check_arg($param, $value);
+	die "Parameter '$param' should be greater than 0.\n"
+	if($value <= 0);
+}
+
+
 1;

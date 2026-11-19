@@ -198,7 +198,7 @@ Visualization options:
 
         my $out_depth = $out.".data";
 
-        system("mkdir $out_depth.tmp");
+        mkdir("$out_depth.tmp") or die "Could not create directory '$out_depth.tmp'.\n";
         system("samtools depth -a -r $chr:$start-$end $bams[0] > $out_depth.tmp/$samples[0]");
 
         foreach(1..$#bams){
